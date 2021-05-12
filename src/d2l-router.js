@@ -9,15 +9,30 @@ import {LitElement} from 'lit-element';
 import {html, nothing} from 'lit-html';
 import page from 'page';
 
-// Observe a context
 page.observeContext = function(callback) {
     if (!this._contextObservers) this._contextObservers = [];
     this._contextObservers.push(callback); 
 }
-// Update the observers
+
 page.updateObservers = function(ctx) {
     if (!this._contextObservers) return;
     this._contextObservers.forEach( observerCallback => observerCallback(ctx))
+}
+
+page.setSearchQuery = function(key, value) {
+    const url = new URL(window.location.href);
+    const search = new URLSearchParams(url.search);
+    search.set(key, value);
+    url.search = search.toString();
+    page.show(url.pathname + url.search);
+}
+
+page.clearSearchQuery = function(key) {
+    const url = new URL(window.location.href);
+    const search = new URLSearchParams(url.search);
+    search.delete(key);
+    url.search = search.toString();
+    page.show(url.pathname + url.search);
 }
 
 let routerConnected = () => {};
@@ -27,6 +42,7 @@ class D2LRouter extends LitElement {
     static get properties() {
         return {
             basePath: {type: String, attribute: 'base-path'},
+            options: {type: Object, attribute: true}
         }
     }
 
@@ -35,11 +51,12 @@ class D2LRouter extends LitElement {
         this.basePath = '';
         this._type = 'd2l-router';
         this.routes = [];
+        this.options = {};
     }
 
     firstUpdated() {
         routerPromise.then(() => {
-            page.start();
+            page.start(this.options);
         })
     }
 

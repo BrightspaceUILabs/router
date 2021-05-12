@@ -50,11 +50,7 @@ class OrgFilterIncrementer extends RouterSearchQueryConsumer(LitElement) {
     incrementOf() {
         let orgFilter = Number.parseInt(this.query.get('of'), 10);
         orgFilter += 1;
-        const url = new URL(window.location.href);
-        const search = new URLSearchParams(url.search);
-        search.set('of', orgFilter);
-        url.search = search.toString();
-        page.show(url.pathname + url.search);
+        page.setSearchQuery('of', orgFilter);
     }
 
     render() {

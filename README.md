@@ -45,3 +45,15 @@ The router params consumer will update whenever the current page's search query 
 ## Context Observing
 
 You can write your own components that attach to the observable context by calling `router.observeContext(callback)` with a callback that updates the components properties. Look at the existing mixins for examples.
+
+
+## Page.js
+Read over the page.js documentation to make sure it's behaviour doesn't conflict with your applications. Page uses the [History Api](https://developer.mozilla.org/en-US/docs/Web/API/History_API) which will require that the server responds to all sub paths of your applications route with the same response.
+
+## Page.js Extensions
+
+This project adds a few new functions to page js to make it easier to use with lit.
+
+### setSearchQuery(key, value)
+
+Will replace a search query with a new value and go to the new page updating any components using the Context or SearchQuery consumers.
