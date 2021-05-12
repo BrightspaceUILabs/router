@@ -1,3 +1,4 @@
+/* eslint-disable func-names */
 /* eslint-disable max-classes-per-file */
 /*
     d2l-router

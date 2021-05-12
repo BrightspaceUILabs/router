@@ -2,7 +2,7 @@
 
 import { LitElement, html, css } from 'lit-element';
 import page from 'page';
-import { RouterContextConsumer, RouterSearchQueryConsumer } from './mixins.js';
+import { RouterContextConsumer, RouterSearchQueryConsumer } from '../src/mixins.js';
 
 class LinkBar extends LitElement {
 
