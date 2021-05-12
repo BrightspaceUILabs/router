@@ -9,7 +9,6 @@
     "format": "eslint --ext .js,.html . --fix --ignore-path .gitignore && prettier \"**/*.js\" --write --ignore-path .gitignore",
     "test:watch": "web-test-runner --watch",
     "start": "web-dev-server --node-resolve --open --watch --app-index demo/index.html",
-    "start:page": "web-dev-server --node-resolve --open --watch --app-index demo/pagejs/index.html"
   },
   "version": "1.0.0",
   "license": "ISC",
