@@ -17,8 +17,19 @@ This will run the demo and the components in examples/components.js
 The router must exist in your application. It also needs to be a parent of the route components but it doesn't need to be a direct parent.
 
 The base path is placed at the begining of all the paths routes.
+
+The options are used to configure Page.js.
 ```html 
-<d2l-router base-path="/d2l">
+<d2l-router 
+    base-path="/d2l"
+    options="${{
+        click: true,
+        popstate: true,
+        dispatch: true,
+        hashbang: false,
+        decodeURLComponents: true
+    }}">
+    <!-- Insert routes here -->
 </d2l-router>
 ```
 

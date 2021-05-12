@@ -42,7 +42,7 @@ class D2LRouter extends LitElement {
     static get properties() {
         return {
             basePath: {type: String, attribute: 'base-path'},
-            options: {type: Object, attribute: true}
+            options: {type: Object, attribute: false}
         }
     }
 
