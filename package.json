@@ -9,6 +9,7 @@
     "format": "eslint --ext .js,.html . --fix --ignore-path .gitignore && prettier \"**/*.js\" --write --ignore-path .gitignore",
     "test:watch": "web-test-runner --watch",
     "test:sauce": "karma start karma.sauce.conf.js",
+    "test:karma:watch": "karma start karma.conf.js --auto-watch=true --single-run=false",
     "prettier:write": "prettier \"**/*.js\" --write --ignore-path .gitignore",
     "start": "web-dev-server --node-resolve --open --watch --app-index demo/index.html"
   },

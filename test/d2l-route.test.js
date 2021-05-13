@@ -1,5 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { fixture, html, expect } from '@open-wc/testing';
+import { fixture, html, expect, waitUntil } from '@open-wc/testing';
 import '../src/d2l-router.js';
 import page from 'page';
 import { runConstructor } from '@brightspace-ui/core/tools/constructor-test-helper.js';
@@ -31,7 +31,7 @@ describe('d2l-route', () => {
             </d2l-router>
         `);
         const routeEl = routerEl.querySelector('d2l-route');
-        await routeEl.updateComplete;
+        await waitUntil(() => routeEl._isActive);
         expect(routeEl._isActive).to.be.true;
         expect(routeEl.render().strings).to.eql(html`<slot></slot>`.strings);
     });
@@ -56,6 +56,8 @@ describe('d2l-route', () => {
             </d2l-router>
         `);
 
+        const routeEl = routerEl.querySelector('d2l-route');
+        await waitUntil(() => routeEl._isActive);
         const el = routerEl.querySelector('test-mixin');
         expect(el.ctx).to.not.be.undefined;
     });
@@ -68,6 +70,9 @@ describe('d2l-route', () => {
                 </d2l-route>
             </d2l-router>
         `);
+
+        const routeEl = routerEl.querySelector('d2l-route');
+        await waitUntil(() => routeEl._isActive);
 
         const el = routerEl.querySelector('test-mixin');
         expect(el.ctx).to.not.be.undefined;
