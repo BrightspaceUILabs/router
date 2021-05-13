@@ -5,57 +5,57 @@ import { router } from './d2l-router.js';
 
 // Listens to page context changes
 export const RouterContextConsumer = dedupeMixin(
-  superclass =>
-    class extends superclass {
-      static get properties() {
-        return {
-          ctx: { type: Object, attribute: true },
-        };
-      }
+    superclass =>
+        class extends superclass {
+            static get properties() {
+                return {
+                    ctx: { type: Object, attribute: true },
+                };
+            }
 
-      constructor() {
-        super();
-        router.observeContext(ctx => {
-          this.ctx = ctx;
-        });
-      }
-    }
+            constructor() {
+                super();
+                router.observeContext(ctx => {
+                    this.ctx = ctx;
+                });
+            }
+        }
 );
 
 // Listens for URL Parameter changes
 export const RouterParamConsumer = dedupeMixin(
-  superclass =>
-    class extends superclass {
-      static get properties() {
-        return {
-          params: { type: Object, attribute: true },
-        };
-      }
+    superclass =>
+        class extends superclass {
+            static get properties() {
+                return {
+                    params: { type: Object, attribute: true },
+                };
+            }
 
-      constructor() {
-        super();
-        router.observeContext(ctx => {
-          this.params = ctx.params;
-        });
-      }
-    }
+            constructor() {
+                super();
+                router.observeContext(ctx => {
+                    this.params = ctx.params;
+                });
+            }
+        }
 );
 
 // Listens for search query changes
 export const RouterSearchQueryConsumer = dedupeMixin(
-  superclass =>
-    class extends superclass {
-      static get properties() {
-        return {
-          query: { type: Object, attribute: true },
-        };
-      }
+    superclass =>
+        class extends superclass {
+            static get properties() {
+                return {
+                    query: { type: Object, attribute: true },
+                };
+            }
 
-      constructor() {
-        super();
-        router.observeContext(ctx => {
-          this.query = new URLSearchParams(ctx.querystring);
-        });
-      }
-    }
+            constructor() {
+                super();
+                router.observeContext(ctx => {
+                    this.query = new URLSearchParams(ctx.querystring);
+                });
+            }
+        }
 );
