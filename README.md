@@ -2,6 +2,22 @@
 
 A lit-element wrapper around Page.js. 
 
+```html
+<d2l-router base-path="/">
+    <d2l-route path="/">
+        <!-- Insert view -->
+    </d2l-route>
+
+    <d2l-route path="/foo">
+        <!-- Insert View -->
+    </d2l-route>
+
+    <d2l-route path="/bar/:barParam">
+        <!-- Insert View -->
+    </d2l-route>
+</d2l-router>
+```
+
 ## Contributing
 
 ### Running
