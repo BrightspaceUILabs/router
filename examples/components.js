@@ -2,14 +2,16 @@
 
 import { LitElement, html, css } from 'lit-element';
 import page from 'page';
-import { RouterContextConsumer, RouterSearchQueryConsumer } from '../src/mixins.js';
+import {
+    RouterContextConsumer,
+    RouterSearchQueryConsumer,
+} from '../src/mixins.js';
 
 class LinkBar extends LitElement {
-
     static get properties() {
         return {
-            _backPeek: {attribute: false}
-        }
+            _backPeek: { attribute: false },
+        };
     }
 
     static get styles() {
@@ -17,7 +19,7 @@ class LinkBar extends LitElement {
             a {
                 margin-right: 10px;
             }
-        `
+        `;
     }
 
     render() {
@@ -25,8 +27,10 @@ class LinkBar extends LitElement {
             <button @click=${() => page.show('/')}>Index</button>
             <button @click=${() => page.show('/about')}>About</button>
             <button @click=${() => page.show('/user/20?of=2')}>User</button>
-            <button @click=${() => page.show('/user/10?of=1')}>User From Another Org</button>
-        `
+            <button @click=${() => page.show('/user/10?of=1')}>
+                User From Another Org
+            </button>
+        `;
     }
 }
 customElements.define('link-bar', LinkBar);
@@ -36,17 +40,16 @@ class TestParamConsumer extends RouterContextConsumer(LitElement) {
         return html`Hello user id: ${this.ctx.params.id}`;
     }
 }
-customElements.define('d2l-test-param', TestParamConsumer)
+customElements.define('d2l-test-param', TestParamConsumer);
 
 class TestQueryConsumer extends RouterSearchQueryConsumer(LitElement) {
     render() {
         return html`org filter: ${this.query.get('of')}`;
     }
 }
-customElements.define('d2l-test-query', TestQueryConsumer)
+customElements.define('d2l-test-query', TestQueryConsumer);
 
 class OrgFilterIncrementer extends RouterSearchQueryConsumer(LitElement) {
-
     incrementOf() {
         let orgFilter = Number.parseInt(this.query.get('of'), 10);
         orgFilter += 1;
@@ -54,7 +57,9 @@ class OrgFilterIncrementer extends RouterSearchQueryConsumer(LitElement) {
     }
 
     render() {
-        return html`<button @click=${this.incrementOf}>Increment Org Filter</button>`
+        return html`<button @click=${this.incrementOf}>
+            Increment Org Filter
+        </button>`;
     }
 }
-customElements.define('d2l-inc-of', OrgFilterIncrementer)
+customElements.define('d2l-inc-of', OrgFilterIncrementer);
