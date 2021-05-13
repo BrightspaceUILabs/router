@@ -2,7 +2,9 @@
 
 A lit-element wrapper around Page.js. 
 
-## Running
+## Contributing
+
+### Running
 
 ```bash
 npm i
@@ -10,6 +12,20 @@ npm run start
 ```
 
 This will run the demo and the components in examples/components.js
+
+### Testing
+
+```bash
+npm run test
+```
+
+The repo is based on the @open-wc template and comes with husky. Testing will run each time you commit. Failed tests may keep you from pushing. Prettier is also used to format the code. You may need to run 
+
+```
+npm run prettier:write
+```
+
+to silence any Prettier related errors.
 
 ## Components
 
