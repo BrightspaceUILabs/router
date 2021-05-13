@@ -9,6 +9,7 @@
     "format": "eslint --ext .js,.html . --fix --ignore-path .gitignore && prettier \"**/*.js\" --write --ignore-path .gitignore",
     "test:watch": "web-test-runner --watch",
     "test:sauce": "karma start karma.sauce.conf.js",
+    "prettier:write": "prettier \"**/*.js\" --write --ignore-path .gitignore",
     "start": "web-dev-server --node-resolve --open --watch --app-index demo/index.html"
   },
   "version": "1.0.0",
@@ -34,12 +35,6 @@
     "karma-sauce-launcher": "^4.3.6",
     "lint-staged": "^10.5.4",
     "prettier": "^2.2.1"
-  },
-  "eslintConfig": {
-    "extends": [
-      "@open-wc/eslint-config",
-      "eslint-config-prettier"
-    ]
   },
   "prettier": {
     "singleQuote": true,

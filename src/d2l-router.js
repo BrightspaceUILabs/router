@@ -104,7 +104,7 @@ class D2LRoute extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
-    // make sure theres a router parent
+    // make sure there's a router parent
     let current = this.parentElement;
     let found = current && current.outerHTML.includes('<d2l-router');
 
