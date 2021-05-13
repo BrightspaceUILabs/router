@@ -1,0 +1,15 @@
+2021-05-13 11:17:50.622 [32312] Sauce Connect 4.6.4, build 5309 21ce484 
+2021-05-13 11:17:50.628 [32312] Trying to autodetect proxy settings
+2021-05-13 11:17:50.649 [32312] Serving metrics on 8888
+2021-05-13 11:17:50.649 [32312] Starting up; pid 32312
+2021-05-13 11:17:50.649 [32312] Command line arguments: C:\Users\nhallman\d2l\d2l-router\node_modules\saucelabs\build\.sc-v4.6.4\bin\sc.exe --tunnel-identifier=karma-sauce-1620919062 --user=undefined --api-key=undefined --rest-url=https://saucelabs.com/rest/v1 
+2021-05-13 11:17:50.649 [32312] Log file: C:\Users\nhallman\d2l\d2l-router\sc-karma-sauce-1620919062.log
+2021-05-13 11:17:50.649 [32312] Pid file: C:\Users\nhallman\AppData\Roaming/sc_client-karma-sauce-1620919062.pid
+2021-05-13 11:17:50.649 [32312] Timezone: EDT GMT offset: -4h
+2021-05-13 11:17:50.649 [32312] Using no proxy for connecting to Sauce Labs REST API.
+2021-05-13 11:17:51.003 [32312] Started scproxy on port 65331.
+2021-05-13 11:17:51.003 [32312] Please wait for 'you may start your tests' to start your tests.
+2021-05-13 11:17:51.474 [32312] failed to check for existing tunnels
+2021-05-13 11:17:51.474 [32312] Sauce Connect could not establish a connection.
+2021-05-13 11:17:51.474 [32312] Please check your firewall and proxy settings.
+2021-05-13 11:17:51.474 [32312] Goodbye.
