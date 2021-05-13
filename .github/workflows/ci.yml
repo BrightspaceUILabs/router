@@ -1,4 +1,4 @@
-name: Draco Insights Dashboard
+name: D2L-Router
 on: pull_request
 jobs:
 

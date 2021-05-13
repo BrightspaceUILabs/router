@@ -16,7 +16,7 @@ This will run the demo and the components in examples/components.js
 ### Testing
 
 ```bash
-npm run test
+npm test
 ```
 
 The repo is based on the @open-wc template and comes with husky. Testing will run each time you commit. Failed tests may keep you from pushing. Prettier is also used to format the code. You may need to run 
@@ -25,14 +25,14 @@ The repo is based on the @open-wc template and comes with husky. Testing will ru
 npm run prettier:write
 ```
 
-to silence any Prettier related errors.
+to silence any Prettier related errors. Husky runs the above command on commit so it is probably unnecessary. 
 
 ## Components
 
 ### d2l-router
 The router must exist in your application. It also needs to be a parent of the route components but it doesn't need to be a direct parent.
 
-The base path is placed at the begining of all the paths routes.
+The base path is placed at the beginning of all the paths routes.
 
 The options are used to configure Page.js.
 ```html 
@@ -75,7 +75,7 @@ You can write your own components that attach to the observable context by calli
 
 
 ## Page.js
-Read over the page.js documentation to make sure it's behaviour doesn't conflict with your applications. Page uses the [History Api](https://developer.mozilla.org/en-US/docs/Web/API/History_API) which will require that the server responds to all sub paths of your applications route with the same response.
+Read over the page.js documentation to make sure it's behavior doesn't conflict with your applications. Page uses the [History Api](https://developer.mozilla.org/en-US/docs/Web/API/History_API) which will require that the server responds to all sub paths of your applications route with the same response.
 
 ## Page.js Extensions
 
