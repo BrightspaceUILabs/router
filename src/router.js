@@ -2,11 +2,17 @@
 import page from 'page';
 
 export class Router {
-    constructor(host, routes) {
+    constructor(host, routes, options) {
+        if (Router._hasConstructed) {
+            throw new Error('May not construct multiple routers.');
+        }
+
+        this.configure(options);
+
         this.host = host;
         this.view = undefined;
 
-        page('*', (context, next) => {
+        this.page('*', (context, next) => {
             context.searchParams = {};
             const searchParams = new URLSearchParams(context.querystring);
             searchParams.forEach((value, key) => {
@@ -16,11 +22,22 @@ export class Router {
         });
 
         this.addRoutes(routes);
-        page();
+        this.page(options);
+        Router._hasConstructed = true;
+    }
+
+    configure(options) {
+        this.page = page;
+        if (options && options.customPage) {
+            this.page = page.create();
+        }
+        if (options && options.basePath) {
+            this.page.base(options.basePath);
+        }
     }
 
     addRoute(r) {
-        page(
+        this.page(
             r.pattern,
             (context, next) => {
                 if (r.loader) {
@@ -55,6 +72,8 @@ export class Router {
     }
 
     redirect(path) {
-        page.redirect(path);
+        this.page.redirect(path);
     }
 }
+
+Router._hasConstructed = false;

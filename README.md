@@ -89,3 +89,25 @@ export function loader(router) {
 ```
 
 The router parameter passed to the loader can be used for redirects. 
+
+## Options
+
+The configurable page.js options are   
+
+| Name                |                               Description                               | Default |
+| :------------------ | :---------------------------------------------------------------------: | ------: |
+| click               |                          bind to click events                           |    true |
+| popstate            |                            bind to popstate                             |    true |
+| dispatch            |                        perform initial dispatch                         |    true |
+| hashbang            |                           add #! before urls                            |   false |
+| decodeURLComponents | remove URL encoding from path components (query string, pathname, hash) |    true |
+
+
+With the addition of
+
+| Name       |                      Description                      | Default |
+| :--------- | :---------------------------------------------------: | ------: |
+| basePath   |       the path all other paths are appended too       |     '/' |
+| customPage | don't use the global page object (useful for testing) |   false |
+
+ 
