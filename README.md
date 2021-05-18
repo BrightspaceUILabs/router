@@ -2,20 +2,21 @@
 
 A lit-element wrapper around Page.js. 
 
-```html
-<d2l-router base-path="/">
-    <d2l-route path="/">
-        <!-- Insert view -->
-    </d2l-route>
-
-    <d2l-route path="/foo">
-        <!-- Insert View -->
-    </d2l-route>
-
-    <d2l-route path="/bar/:barParam">
-        <!-- Insert View -->
-    </d2l-route>
-</d2l-router>
+```js
+// Route Loader Array
+[
+    {
+        pattern: '/example',
+        loader: () => import('./home.js'),
+        view: () => html`<test-home></test-home>`
+    },
+    peopleRouteLoader,
+    placesRouteLoader,
+    {
+        pattern: '*',
+        view: () => html`<h1>Not Found</h1>`
+    },
+];
 ```
 
 ## Contributing
@@ -27,8 +28,6 @@ npm i
 npm run start 
 ```
 
-This will run the demo and the components in examples/components.js
-
 ### Testing
 
 ```bash
@@ -38,65 +37,77 @@ npm test
 The repo is based on the @open-wc template and comes with husky. Testing will run each time you commit. Failed tests may keep you from pushing. Prettier is also used to format the code. You may need to run 
 
 ```
-npm run prettier:write
+npx run prettier:write
 ```
 
 to silence any Prettier related errors. Husky runs the above command on commit so it is probably unnecessary. 
 
-## Components
+## Usage
 
-### d2l-router
-The router must exist in your application. It also needs to be a parent of the route components but it doesn't need to be a direct parent.
+Your applications entry point will need to create and initialize the router. Routes must be loaded all at once otherwise the router won't know which view to show.
 
-The base path is placed at the beginning of all the paths routes.
+The entry point should look like this
 
-The options are used to configure Page.js.
-```html 
-<d2l-router 
-    base-path="/d2l"
-    options="${{
-        click: true,
-        popstate: true,
-        dispatch: true,
-        hashbang: false,
-        decodeURLComponents: true
-    }}">
-    <!-- Insert routes here -->
-</d2l-router>
+```js
+// app.js
+import {routeLoader} from './route-loader.js';
+
+class App extends LitElement {
+    constructor() {
+		super();
+		this.router = new Router(this, routeLoader);
+    }
+    
+    render() {
+        return this.router.view;
+    }
+}
 ```
 
-### d2l-route
-The route element will draw it's children when the url matches the pattern.
-```html 
-<d2l-route path="/content">
-    <span>I will draw at /d2l/content</span>
-</d2l-route>
+The route loader is responsible for declaring all of the routes your application will use. You can declare multiple route loaders as long as they are imported by the main one used in you app entry-point.
+
+```js
+// route-loader.js
+export function loader(router) {
+	return [
+		{
+            // the route that will show this template.
+            pattern: '/example',
+            // any additional dependencies it may require.
+            loader: () => import('./home.js'),
+            // the template to be rendered.
+			view: () => html`<test-home></test-home>` 
+		},
+		peopleRouteLoader,
+		placesRouteLoader,
+		{
+			pattern: '*',
+			view: () => html`<h1>Not Found</h1>`
+		},
+	];
+}
 ```
-Page.js supports lots of patterns so check out their documentation https://visionmedia.github.io/page.js/
 
-## Mixins
+The router parameter passed to the loader can be used for redirects. 
 
-### RouterContextConsumer
-The router context consumer will update whenever the current page's context changes and set the components `ctx` property.
+## Options
 
-### RouterParamConsumer
-The router params consumer will update whenever the current page's url parameters change and will set the components `params` property.
+The configurable page.js options are   
 
-### RouterSearchQueryConsumer
-The router params consumer will update whenever the current page's search query change and will set the components `query` property as a URLSearchParams object.
-
-## Context Observing
-
-You can write your own components that attach to the observable context by calling `router.observeContext(callback)` with a callback that updates the components properties. Look at the existing mixins for examples.
+| Name                |                               Description                               | Default |
+| :------------------ | :---------------------------------------------------------------------: | ------: |
+| click               |                          bind to click events                           |    true |
+| popstate            |                            bind to popstate                             |    true |
+| dispatch            |                        perform initial dispatch                         |    true |
+| hashbang            |                           add #! before urls                            |   false |
+| decodeURLComponents | remove URL encoding from path components (query string, pathname, hash) |    true |
 
 
-## Page.js
-Read over the page.js documentation to make sure it's behavior doesn't conflict with your applications. Page uses the [History Api](https://developer.mozilla.org/en-US/docs/Web/API/History_API) which will require that the server responds to all sub paths of your applications route with the same response.
+With the addition of
 
-## Page.js Extensions
+| Name       |                      Description                      | Default |
+| :--------- | :---------------------------------------------------: | ------: |
+| basePath   |       the path all other paths are appended too       |     '/' |
+| customPage | don't use the global page object (useful for testing) |   false |
 
-This project adds a few new functions to page js to make it easier to use with lit.
-
-### setSearchQuery(key, value)
-
-Will replace a search query with a new value and go to the new page updating any components using the Context or SearchQuery consumers.
+ 
