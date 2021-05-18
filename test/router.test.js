@@ -5,6 +5,7 @@ import { Router } from '../src/router.js';
 import './helpers/main-view.js';
 import './helpers/loader-view.js';
 import './helpers/depend-view.js';
+import './helpers/param-query-view.js';
 
 let lastPage = {};
 
@@ -66,7 +67,7 @@ describe('Router', () => {
     });
 
     // test component changes view
-    it('It should load routes from separate files', async () => {
+    it('Should load routes from separate files', async () => {
         const el = await fixture(html`<loader-view></loader-view>`);
         await el.updateComplete;
         lastPage = el.router.page;
@@ -87,7 +88,7 @@ describe('Router', () => {
     });
 
     // test component changes view
-    it('It should lazy import route dependencies', async () => {
+    it('Should lazy import route dependencies', async () => {
         expect(customElements.get('lazy-view')).to.not.exist;
 
         const el = await fixture(html`<depend-view></depend-view>`);
@@ -98,5 +99,19 @@ describe('Router', () => {
         await waitUntil(() => customElements.get('lazy-view'));
 
         expect(customElements.get('lazy-view')).to.exist;
+    });
+
+    // test router passes context
+    it('Should pass the context on redirect', async () => {
+        const el = await fixture(html`<param-query-view></param-query-view>`);
+        await el.updateComplete;
+        lastPage = el.router.page;
+
+        lastPage.redirect('/hello?test=hello');
+        await waitUntil(() => el.shadowRoot.querySelector('p'));
+
+        expect(el.shadowRoot.querySelector('p').innerText).to.equal(
+            'Index hello hello'
+        );
     });
 });
