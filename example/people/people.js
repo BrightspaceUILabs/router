@@ -1,3 +1,4 @@
+/* eslint-disable lit-a11y/no-invalid-change-handler */
 import { html, LitElement } from 'lit-element';
 
 export const people = [
@@ -78,7 +79,7 @@ export class People extends LitElement {
             <h1>People</h1>
             <label>
                 Filter:
-                <select @blur="${this._applyFilter}">
+                <select @change="${this._applyFilter}">
                     ${filters.map(
                         f =>
                             html`<option

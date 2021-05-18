@@ -1,10 +1,12 @@
 # Router
 
-A lit-element wrapper around Page.js. 
+A lit-element wrapper around Page.js.
 
+The aim of this library is to provide an easy way to define routes, lazy load the view, and update to changes in the route. 
+
+## Route Loading and Registration
 ```js
-// Route Loader Array
-[
+registerRoutes([
     {
         pattern: '/example',
         loader: () => import('./home.js'),
@@ -16,7 +18,43 @@ A lit-element wrapper around Page.js.
         pattern: '*',
         view: () => html`<h1>Not Found</h1>`
     },
-];
+], options // the router configurations);
+```
+
+This is the first step. Registering routes builds the routing tree that the application uses to determine which view to show at the entry-point.
+
+## Displaying the Active View
+The ViewReactor is an early Reactive Controller that updates an element when the current routes view changes.
+
+```js
+class EntryPoint extends LitElement {
+    constructor() {
+        super();
+        this.viewReactor = ViewReactor(this);
+    }
+
+    render() {
+        return this.viewReactor.view;
+    }
+}
+```
+
+## Reacting to Route Changes
+The RouteReactor is used to update a component when there are changes to the path, search, or url parameters of a route.
+
+```js
+class EntryPoint extends LitElement {
+    constructor() {
+        super();
+        this.routeReactor = RouteReactor(this);
+    }
+
+    render() {
+        let userId = this.routeReactor.params.userId;
+        let orgId = this.routeReactor.get('org-unit')
+        return html`<span> user: ${userId} orgUnit: ${orgId}</span>`;
+    }
+}
 ```
 
 ## Contributing
@@ -42,55 +80,29 @@ npx run prettier:write
 
 to silence any Prettier related errors. Husky runs the above command on commit so it is probably unnecessary. 
 
-## Usage
+## Helpers
 
-Your applications entry point will need to create and initialize the router. Routes must be loaded all at once otherwise the router won't know which view to show.
+### Redirecting
 
-The entry point should look like this
-
-```js
-// app.js
-import {routeLoader} from './route-loader.js';
-
-class App extends LitElement {
-    constructor() {
-		super();
-		this.router = new Router(this, routeLoader);
-    }
-    
-    render() {
-        return this.router.view;
-    }
-}
-```
-
-The route loader is responsible for declaring all of the routes your application will use. You can declare multiple route loaders as long as they are imported by the main one used in you app entry-point.
+Page.js will hook into any `<a>` tags and run the redirect but if you want to redirect in javascript you can use.
 
 ```js
-// route-loader.js
-export function loader(router) {
-	return [
-		{
-            // the route that will show this template.
-            pattern: '/example',
-            // any additional dependencies it may require.
-            loader: () => import('./home.js'),
-            // the template to be rendered.
-			view: () => html`<test-home></test-home>` 
-		},
-		peopleRouteLoader,
-		placesRouteLoader,
-		{
-			pattern: '*',
-			view: () => html`<h1>Not Found</h1>`
-		},
-	];
-}
+import { redirect } from '@brightspace-ui-labs/router';
+
+redirect('/');
 ```
 
-The router parameter passed to the loader can be used for redirects. 
+### Testing
+
+`resetForTesting` can be used to stop, and restart a new Page.js instance. This is useful for tests that may reuse routes.
+
+```js
+beforeEach(() => resetForTesting());
+```
 
 ## Options
+
+Options are the second parameter in the registerRoutes functions. The two tables below encompasses all of the attributes that the options object can use.
 
 The configurable page.js options are   
 
@@ -110,4 +122,4 @@ With the addition of
 | basePath   |       the path all other paths are appended too       |     '/' |
 | customPage | don't use the global page object (useful for testing) |   false |
 
- 
+

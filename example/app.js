@@ -1,6 +1,6 @@
 import { css, html, LitElement } from 'lit-element';
-import { loader as routeLoader } from './route-loader.js';
-import { Router } from '../src/router.js';
+import { ViewReactor } from '../src/ViewReactor.js';
+import './route-loader.js';
 
 export class App extends LitElement {
     static get styles() {
@@ -21,7 +21,7 @@ export class App extends LitElement {
 
     constructor() {
         super();
-        this.router = new Router(this, routeLoader);
+        this.viewReactor = new ViewReactor(this);
     }
 
     render() {
@@ -35,7 +35,7 @@ export class App extends LitElement {
                     </ul>
                 </nav>
             </aside>
-            <main>${this.router.view}</main>
+            <main>${this.viewReactor.view}</main>
         `;
     }
 }
