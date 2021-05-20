@@ -29,6 +29,11 @@ const initRouter = () => {
                 pattern: '/param/:test',
                 view: () => html`<route-view></route-view>`,
             },
+            {
+                pattern: '/param/:foo/:bar',
+                view: (foo, bar, search) =>
+                    html`<p>${foo}, ${bar}, ${search.test}</p>`,
+            },
             load1,
             load2,
         ],
@@ -112,5 +117,19 @@ describe('Router', () => {
         expect(paramQueryEl.shadowRoot.querySelector('p').innerText).to.equal(
             'Param test: hello, Search Test: hello'
         );
+    });
+
+    it('Should pass parameters in left-to-right', async () => {
+        redirect('/param/beep/boop');
+        await waitUntil(() => entryPoint.shadowRoot.querySelector('p'));
+        const p = entryPoint.shadowRoot.querySelector('p').innerText;
+        expect(p).to.eql('beep, boop,');
+    });
+
+    it('Should pass parameters in left-to-right with search param at the end', async () => {
+        redirect('/param/zip/zap?test=zop');
+        await waitUntil(() => entryPoint.shadowRoot.querySelector('p'));
+        const p = entryPoint.shadowRoot.querySelector('p').innerText;
+        expect(p).to.eql('zip, zap, zop');
     });
 });

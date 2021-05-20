@@ -12,8 +12,17 @@ registerRoutes([
         loader: () => import('./home.js'),
         view: () => html`<test-home></test-home>`
     },
-    peopleRouteLoader,
-    placesRouteLoader,
+    {
+        pattern: '/example/:id',
+        view: id => html`<test-id id=${id}></test-id>`
+    },
+    {
+        pattern: '/example/foo/:bar',
+        view: (bar, search) => html`
+            <test-foo bar=${bar}>
+                ${search.name}
+            </test-foo>`
+    }
     {
         pattern: '*',
         view: (ctx) => html`<h1>Not Found ${ctx.pathName}</h1>`
@@ -23,7 +32,36 @@ registerRoutes([
 
 This is the first step. Registering routes builds the routing tree that the application uses to determine which view to show at the entry-point. A routes view is a function that returns a lit-html template. This template gets rendered into your applications entry-point when the url matches the pattern.
 
-The view is also passed a page context object 
+The view is also passed the url parameters and search object in definition order from left to right. For example:
+
+```js 
+pattern: '/user/:id/:page'
+view: (id, page) => html`<user-view id=${id} page=${page}></user-view>` 
+```
+
+A `URLSearchParameters` object is always the last parameter of the view function:
+
+```js 
+pattern: '/user' // search: ?id=1&page=1&semester=1
+view: (search) => html`
+    <user-view 
+        ?id=${search.id} 
+        ?page=${search.page)} 
+        ?semester=${search.semester}>
+    </user-view>` 
+```
+
+They can also be used together:
+
+```js 
+pattern: '/user/:id/:page' // search: ?semester=1
+view: (id, page, search) => html`
+    <user-view 
+        id=${id} 
+        page=${page} 
+        ?semester=${search.semester}>
+    </user-view>` 
+```
 
 ## RouteReactor
 The RouteReactor is an early Reactive Controller that updates an element when the current route changes.
@@ -52,7 +90,7 @@ class FooBar extends LitElement {
 
     render() {
         let userId = this.route.params.userId;
-        let orgId = this.route.search.get('org-unit');
+        let orgId = this.route.search['org-unit'];
 
         return html`<span> user: ${userId} orgUnit: ${orgId}</span>`;
     }
