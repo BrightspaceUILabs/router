@@ -51,7 +51,7 @@ class EntryPoint extends LitElement {
 
     render() {
         let userId = this.routeReactor.params.userId;
-        let orgId = this.routeReactor.get('org-unit')
+        let orgId = this.routeReactor.search.get('org-unit')
         return html`<span> user: ${userId} orgUnit: ${orgId}</span>`;
     }
 }
