@@ -80,6 +80,24 @@ npx run prettier:write
 
 to silence any Prettier related errors. Husky runs the above command on commit so it is probably unnecessary. 
 
+For testing page routing in your application we recommend using this template.
+
+```js
+describe('Page Routing', () => {
+    beforeEach(async () => {
+        initRouter(); // Either initialize your routes here or import a file that calls routeRegister and make a way to recall it.
+        entryPoint = await fixture(html`<!-- Your ViewReactor component here -->`);
+        redirect('/'); // Reset tests back to the index, clears the url
+    });
+
+    afterEach(() => {
+        RouterTesting.reset(); // creates a new router instance, clears any router related reactive controllers.
+    });
+
+    // Your tests here
+});
+```
+
 ## Helpers
 
 ### Redirecting
@@ -90,14 +108,6 @@ Page.js will hook into any `<a>` tags and run the redirect but if you want to re
 import { redirect } from '@brightspace-ui-labs/router';
 
 redirect('/');
-```
-
-### Testing
-
-`resetForTesting` can be used to stop, and restart a new Page.js instance. This is useful for tests that may reuse routes.
-
-```js
-beforeEach(() => resetForTesting());
 ```
 
 ## Options
