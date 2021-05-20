@@ -1,14 +1,14 @@
 import { LitElement } from 'lit-element';
-import { ViewReactor } from '../../src/ViewReactor.js';
+import { RouteReactor } from '../../src/RouteReactor.js';
 
 class MainView extends LitElement {
     constructor() {
         super();
-        this.viewReactor = new ViewReactor(this);
+        this.route = new RouteReactor(this);
     }
 
     render() {
-        return this.viewReactor.view;
+        return this.route.view;
     }
 }
 

@@ -16,42 +16,44 @@ registerRoutes([
     placesRouteLoader,
     {
         pattern: '*',
-        view: () => html`<h1>Not Found</h1>`
+        view: (ctx) => html`<h1>Not Found ${ctx.pathName}</h1>`
     },
 ], options // the router configurations);
 ```
 
-This is the first step. Registering routes builds the routing tree that the application uses to determine which view to show at the entry-point.
+This is the first step. Registering routes builds the routing tree that the application uses to determine which view to show at the entry-point. A routes view is a function that returns a lit-html template. This template gets rendered into your applications entry-point when the url matches the pattern.
 
-## Displaying the Active View
-The ViewReactor is an early Reactive Controller that updates an element when the current routes view changes.
+The view is also passed a page context object 
+
+## RouteReactor
+The RouteReactor is an early Reactive Controller that updates an element when the current route changes.
 
 ```js
 class EntryPoint extends LitElement {
     constructor() {
         super();
-        this.viewReactor = ViewReactor(this);
+        this.route = RouteReactor(this);
     }
 
     render() {
-        return this.viewReactor.view;
+        return this.route.view;
     }
 }
 ```
 
-## Reacting to Route Changes
-The RouteReactor is used to update a component when there are changes to the path, search, or url parameters of a route.
+It can also be used by a component that needs to listen to changes to the url.
 
 ```js
-class EntryPoint extends LitElement {
+class FooBar extends LitElement {
     constructor() {
         super();
-        this.routeReactor = RouteReactor(this);
+        this.route = RouteReactor(this);
     }
 
     render() {
-        let userId = this.routeReactor.params.userId;
-        let orgId = this.routeReactor.search.get('org-unit')
+        let userId = this.route.params.userId;
+        let orgId = this.route.search.get('org-unit');
+
         return html`<span> user: ${userId} orgUnit: ${orgId}</span>`;
     }
 }
