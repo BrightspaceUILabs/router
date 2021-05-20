@@ -7,7 +7,7 @@ export function loader() {
         {
             pattern: '/people',
             loader: () => import('./people.js'),
-            view: search => html` <test-people
+            view: (_, search) => html` <test-people
                 @filter-change="${e =>
                     redirect(`/example/people?filter=${e.detail.value}`)}"
                 filter="${ifDefined(search.filter)}"
@@ -16,7 +16,8 @@ export function loader() {
         {
             pattern: '/people/:id',
             loader: () => import('./person.js'),
-            view: id => html`<test-person person-id="${id}"></test-person>`,
+            view: params =>
+                html`<test-person person-id="${params.id}"></test-person>`,
         },
     ];
 }

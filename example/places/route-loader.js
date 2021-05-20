@@ -10,7 +10,8 @@ export function loader() {
         {
             pattern: '/places/:id',
             loader: () => import('./place.js'),
-            view: id => html`<test-place place-id="${id}"></test-place>`,
+            view: params =>
+                html`<test-place place-id="${params.id}"></test-place>`,
         },
     ];
 }

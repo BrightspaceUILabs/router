@@ -31,8 +31,12 @@ const initRouter = () => {
             },
             {
                 pattern: '/param/:foo/:bar',
-                view: (foo, bar, search) =>
-                    html`<p>${foo}, ${bar}, ${search.test}</p>`,
+                view: (params, search) =>
+                    html`<p>${params.foo}, ${params.bar}, ${search.test}</p>`,
+            },
+            {
+                pattern: '/search',
+                view: (_, search) => html`<p>${search.test}</p>`,
             },
             load1,
             load2,
@@ -131,5 +135,12 @@ describe('Router', () => {
         await waitUntil(() => entryPoint.shadowRoot.querySelector('p'));
         const p = entryPoint.shadowRoot.querySelector('p').innerText;
         expect(p).to.eql('zip, zap, zop');
+    });
+
+    it('Should pass a search parameter without any url params', async () => {
+        redirect('/search?test=test');
+        await waitUntil(() => entryPoint.shadowRoot.querySelector('p'));
+        const p = entryPoint.shadowRoot.querySelector('p').innerText;
+        expect(p).to.eql('test');
     });
 });

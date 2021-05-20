@@ -14,18 +14,18 @@ registerRoutes([
     },
     {
         pattern: '/example/:id',
-        view: id => html`<test-id id=${id}></test-id>`
+        view: params => html`<test-id id=${params.id}></test-id>`
     },
     {
         pattern: '/example/foo/:bar',
-        view: (bar, search) => html`
-            <test-foo bar=${bar}>
+        view: (params, search) => html`
+            <test-foo bar=${params.bar}>
                 ${search.name}
             </test-foo>`
     }
     {
         pattern: '*',
-        view: (ctx) => html`<h1>Not Found ${ctx.pathName}</h1>`
+        view: () => html`<h1>Not Found</h1>`
     },
 ], options // the router configurations);
 ```
@@ -36,14 +36,14 @@ The view is also passed the url parameters and search object in definition order
 
 ```js 
 pattern: '/user/:id/:page'
-view: (id, page) => html`<user-view id=${id} page=${page}></user-view>` 
+view: (params) => html`<user-view id=${params.id} page=${params.page}></user-view>` 
 ```
 
 A `URLSearchParameters` object is always the last parameter of the view function:
 
 ```js 
 pattern: '/user' // search: ?id=1&page=1&semester=1
-view: (search) => html`
+view: (_, search) => html`
     <user-view 
         ?id=${search.id} 
         ?page=${search.page)} 
@@ -55,10 +55,10 @@ They can also be used together:
 
 ```js 
 pattern: '/user/:id/:page' // search: ?semester=1
-view: (id, page, search) => html`
+view: (params, search) => html`
     <user-view 
-        id=${id} 
-        page=${page} 
+        id=${params.id} 
+        page=${params.page} 
         ?semester=${search.semester}>
     </user-view>` 
 ```

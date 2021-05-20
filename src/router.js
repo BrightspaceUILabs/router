@@ -6,14 +6,10 @@ let _lastOptions = {};
 
 const _handleRouteView = (context, next, r) => {
     if (r.view) {
-        const paramKeys = context.routePath
-            .split('/')
-            .filter(part => part.charAt(0) === ':')
-            .map(key => key.substr(1));
-
-        const params = paramKeys.map(key => context.params[key]);
-
-        context.view = r.view.apply(null, [...params, context.searchParams]);
+        context.view = r.view.apply(null, [
+            context.params,
+            context.searchParams,
+        ]);
         context.handled = true;
 
         next();
