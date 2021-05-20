@@ -2,7 +2,7 @@ import { html } from 'lit-element';
 
 export const loader = () => [
     {
-        pattern: '/',
-        view: () => html`<p>Index</p>`,
+        pattern: '/load1',
+        view: () => html`<p>Load 1</p>`,
     },
 ];

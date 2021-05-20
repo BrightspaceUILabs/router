@@ -2,27 +2,30 @@
 import page from 'page';
 
 let activePage = page;
+let _lastOptions = {};
+
+const _handleRouteView = (context, next, r) => {
+    if (r.view) {
+        context.view = r.view(context);
+        context.handled = true;
+        next();
+    } else {
+        next();
+    }
+};
+
+const _handleRouteLoader = r => (context, next) => {
+    if (r.loader) {
+        r.loader().then(() => {
+            _handleRouteView(context, next, r);
+        });
+    } else {
+        _handleRouteView(context, next, r);
+    }
+};
 
 const _registerRoute = r => {
-    activePage(
-        r.pattern,
-        (context, next) => {
-            if (r.loader) {
-                r.loader().then(() => next());
-            } else {
-                next();
-            }
-        },
-        (context, next) => {
-            if (r.view) {
-                context.view = r.view(context);
-                context.handled = true;
-                next();
-            } else {
-                next();
-            }
-        }
-    );
+    activePage(r.pattern, _handleRouteLoader(r));
 };
 
 const _registerRoutes = routes => {
@@ -43,9 +46,15 @@ const configure = options => {
     if (options && options.customPage) activePage = page.create();
     if (options && options.basePath) activePage.base(options.basePath);
     activePage(options);
+    _lastOptions = options;
 };
 
+let hasRegistered = false;
+
 export const registerRoutes = (routes, options) => {
+    if (hasRegistered) throw new Error('May not construct multiple routers.');
+    hasRegistered = true;
+
     configure(options);
 
     activePage('*', (context, next) => {
@@ -59,19 +68,51 @@ export const registerRoutes = (routes, options) => {
     _registerRoutes(routes);
 };
 
-export const addMiddleware = callback => {
+const addMiddleware = callback => {
     activePage('*', (ctx, next) => {
         callback(ctx);
         next();
     });
-    activePage();
-};
-
-export const resetForTesting = () => {
-    activePage.stop();
-    activePage = page.create();
 };
 
 export const redirect = path => {
     activePage(path);
+};
+
+export class ContextReactor {
+    constructor(host, callback) {
+        ContextReactor.listeners.push({ host, callback });
+
+        if (ContextReactor.listeners.length === 1) {
+            addMiddleware(ctx => {
+                ContextReactor.listeners.forEach(listener => {
+                    listener.callback(ctx);
+                    listener.host.requestUpdate();
+                });
+            });
+        }
+    }
+
+    init() {
+        activePage();
+    }
+
+    static reset() {
+        this.listeners = [];
+    }
+}
+
+ContextReactor.listeners = [];
+
+export const RouterTesting = {
+    reset: () => {
+        activePage.stop();
+        activePage = page.create();
+        hasRegistered = false;
+        ContextReactor.reset();
+    },
+
+    restart: () => {
+        activePage.start(_lastOptions);
+    },
 };

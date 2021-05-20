@@ -1,29 +1,25 @@
 import { LitElement, html } from 'lit-element';
-import { Router } from '../../src/router.js';
+import { RouteReactor } from '../../src/RouteReactor.js';
 
 class ParamQueryView extends LitElement {
+    static get properties() {
+        return {
+            params: { type: Object, attribute: false },
+            search: { type: Object, attribute: false },
+        };
+    }
+
     constructor() {
         super();
-
-        this.router = new Router(
-            this,
-            [
-                {
-                    pattern: '/:test',
-                    view: context =>
-                        html`<p>
-                            Index ${new URLSearchParams(context.search).test}
-                            ${context.params.test}
-                        </p>`,
-                },
-            ],
-            { customPage: true, hashbang: true }
-        );
+        this.route = new RouteReactor(this);
     }
 
     render() {
-        return this.router.view;
+        return html`<p>
+            Param test: ${this.route.params.test}, Search Test:
+            ${this.route.search.test}
+        </p>`;
     }
 }
 
-customElements.define('param-query-view', ParamQueryView);
+customElements.define('route-view', ParamQueryView);
