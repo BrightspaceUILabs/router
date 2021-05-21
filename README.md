@@ -96,7 +96,7 @@ registerRoute([
 ])
 
 /* src/page1/route-loader.js */
-export const () => [
+export const loader () => [
     {
         pattern: '/page1',
         loader: () => import('./page1-view.js'),
