@@ -1,79 +1,118 @@
 /* eslint-disable class-methods-use-this */
 import page from 'page';
 
-export class Router {
-    constructor(host, routes, options) {
-        if (Router._hasConstructed) {
-            throw new Error('May not construct multiple routers.');
+let activePage = page;
+let _lastOptions = {};
+
+const _handleRouteView = (context, next, r) => {
+    if (r.view) {
+        context.view = r.view(context);
+        context.handled = true;
+        next();
+    } else {
+        next();
+    }
+};
+
+const _handleRouteLoader = r => (context, next) => {
+    if (r.loader) {
+        r.loader().then(() => {
+            _handleRouteView(context, next, r);
+        });
+    } else {
+        _handleRouteView(context, next, r);
+    }
+};
+
+const _registerRoute = r => {
+    activePage(r.pattern, _handleRouteLoader(r));
+};
+
+const _registerRoutes = routes => {
+    if (typeof routes === 'function') {
+        _registerRoutes(routes());
+        return;
+    }
+    routes.forEach(r => {
+        if (typeof r === 'function') {
+            _registerRoutes(r());
+        } else {
+            _registerRoute(r);
         }
+    });
+};
 
-        this.configure(options);
+const configure = options => {
+    if (options && options.customPage) activePage = page.create();
+    if (options && options.basePath) activePage.base(options.basePath);
+    activePage(options);
+    _lastOptions = options;
+};
 
-        this.host = host;
-        this.view = undefined;
+let hasRegistered = false;
 
-        this.page('*', (context, next) => {
-            context.searchParams = {};
-            const searchParams = new URLSearchParams(context.querystring);
-            searchParams.forEach((value, key) => {
-                context.searchParams[key] = value;
+export const registerRoutes = (routes, options) => {
+    if (hasRegistered) throw new Error('May not construct multiple routers.');
+    hasRegistered = true;
+
+    configure(options);
+
+    activePage('*', (context, next) => {
+        context.searchParams = {};
+        const searchParams = new URLSearchParams(context.querystring);
+        searchParams.forEach((value, key) => {
+            context.searchParams[key] = value;
+        });
+        next();
+    });
+    _registerRoutes(routes);
+};
+
+const addMiddleware = callback => {
+    activePage('*', (ctx, next) => {
+        callback(ctx);
+        next();
+    });
+};
+
+export const redirect = path => {
+    activePage(path);
+};
+
+export class ContextReactor {
+    constructor(host, callback) {
+        ContextReactor.listeners.push({ host, callback });
+
+        if (ContextReactor.listeners.length === 1) {
+            addMiddleware(ctx => {
+                ContextReactor.listeners.forEach(listener => {
+                    listener.callback(ctx);
+                    listener.host.requestUpdate();
+                });
             });
-            next();
-        });
-
-        this.addRoutes(routes);
-        this.page(options);
-        Router._hasConstructed = true;
-    }
-
-    configure(options) {
-        this.page = page;
-        if (options && options.customPage) {
-            this.page = page.create();
-        }
-        if (options && options.basePath) {
-            this.page.base(options.basePath);
         }
     }
 
-    addRoute(r) {
-        this.page(
-            r.pattern,
-            (context, next) => {
-                if (r.loader) {
-                    r.loader().then(() => next());
-                } else {
-                    next();
-                }
-            },
-            (context, next) => {
-                if (r.view) {
-                    this.view = r.view(context);
-                    this.host.requestUpdate();
-                } else {
-                    next();
-                }
-            }
-        );
+    init() {
+        activePage();
     }
 
-    addRoutes(routes) {
-        if (typeof routes === 'function') {
-            this.addRoutes(routes(this));
-            return;
-        }
-        routes.forEach(r => {
-            if (typeof r === 'function') {
-                this.addRoutes(r(this));
-            } else {
-                this.addRoute(r);
-            }
-        });
-    }
-
-    redirect(path) {
-        this.page.redirect(path);
+    static reset() {
+        this.listeners = [];
     }
 }
 
-Router._hasConstructed = false;
+ContextReactor.listeners = [];
+
+export const RouterTesting = {
+    reset: () => {
+        activePage.stop();
+        activePage = page.create();
+        hasRegistered = false;
+        ContextReactor.reset();
+    },
+
+    restart: () => {
+        activePage.start(_lastOptions);
+    },
+};

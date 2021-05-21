@@ -1,10 +1,12 @@
 # Router
 
-A lit-element wrapper around Page.js. 
+A lit-element wrapper around Page.js.
 
+The aim of this library is to provide an easy way to define routes, lazy load the view, and update to changes in the route. 
+
+## Route Loading and Registration
 ```js
-// Route Loader Array
-[
+registerRoutes([
     {
         pattern: '/example',
         loader: () => import('./home.js'),
@@ -14,9 +16,47 @@ A lit-element wrapper around Page.js.
     placesRouteLoader,
     {
         pattern: '*',
-        view: () => html`<h1>Not Found</h1>`
+        view: (ctx) => html`<h1>Not Found ${ctx.pathName}</h1>`
     },
-];
+], options // the router configurations);
+```
+
+This is the first step. Registering routes builds the routing tree that the application uses to determine which view to show at the entry-point. A routes view is a function that returns a lit-html template. This template gets rendered into your applications entry-point when the url matches the pattern.
+
+The view is also passed a page context object 
+
+## RouteReactor
+The RouteReactor is an early Reactive Controller that updates an element when the current route changes.
+
+```js
+class EntryPoint extends LitElement {
+    constructor() {
+        super();
+        this.route = RouteReactor(this);
+    }
+
+    render() {
+        return this.route.view;
+    }
+}
+```
+
+It can also be used by a component that needs to listen to changes to the url.
+
+```js
+class FooBar extends LitElement {
+    constructor() {
+        super();
+        this.route = RouteReactor(this);
+    }
+
+    render() {
+        let userId = this.route.params.userId;
+        let orgId = this.route.search.get('org-unit');
+
+        return html`<span> user: ${userId} orgUnit: ${orgId}</span>`;
+    }
+}
 ```
 
 ## Contributing
@@ -42,55 +82,39 @@ npx run prettier:write
 
 to silence any Prettier related errors. Husky runs the above command on commit so it is probably unnecessary. 
 
-## Usage
-
-Your applications entry point will need to create and initialize the router. Routes must be loaded all at once otherwise the router won't know which view to show.
-
-The entry point should look like this
+For testing page routing in your application we recommend using this template.
 
 ```js
-// app.js
-import {routeLoader} from './route-loader.js';
+describe('Page Routing', () => {
+    beforeEach(async () => {
+        initRouter(); // Either initialize your routes here or import a file that calls routeRegister and make a way to recall it.
+        entryPoint = await fixture(html`<!-- Your ViewReactor component here -->`);
+        redirect('/'); // Reset tests back to the index, clears the url
+    });
 
-class App extends LitElement {
-    constructor() {
-		super();
-		this.router = new Router(this, routeLoader);
-    }
-    
-    render() {
-        return this.router.view;
-    }
-}
+    afterEach(() => {
+        RouterTesting.reset(); // creates a new router instance, clears any router related reactive controllers.
+    });
+
+    // Your tests here
+});
 ```
 
-The route loader is responsible for declaring all of the routes your application will use. You can declare multiple route loaders as long as they are imported by the main one used in you app entry-point.
+## Helpers
+
+### Redirecting
+
+Page.js will hook into any `<a>` tags and run the redirect but if you want to redirect in javascript you can use.
 
 ```js
-// route-loader.js
-export function loader(router) {
-	return [
-		{
-            // the route that will show this template.
-            pattern: '/example',
-            // any additional dependencies it may require.
-            loader: () => import('./home.js'),
-            // the template to be rendered.
-			view: () => html`<test-home></test-home>` 
-		},
-		peopleRouteLoader,
-		placesRouteLoader,
-		{
-			pattern: '*',
-			view: () => html`<h1>Not Found</h1>`
-		},
-	];
-}
-```
+import { redirect } from '@brightspace-ui-labs/router';
 
-The router parameter passed to the loader can be used for redirects. 
+redirect('/');
+```
 
 ## Options
+
+Options are the second parameter in the registerRoutes functions. The two tables below encompasses all of the attributes that the options object can use.
 
 The configurable page.js options are   
 
@@ -110,4 +134,4 @@ With the addition of
 | basePath   |       the path all other paths are appended too       |     '/' |
 | customPage | don't use the global page object (useful for testing) |   false |
 
- 
+

@@ -1,8 +1,17 @@
 import { LitElement, html } from 'lit-element';
 
 class LazyView extends LitElement {
+    static get properties() {
+        return {};
+    }
+
+    connectedCallback() {
+        super.connectedCallback();
+        console.log('Connected lazy view');
+    }
+
     render() {
-        return html`<p>Lazy</p>`;
+        return html`<p>Hello</p>`;
     }
 }
 

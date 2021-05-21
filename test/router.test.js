@@ -1,102 +1,116 @@
+/* eslint-disable no-return-assign */
 /* eslint-disable no-new */
 import { expect, fixture, html, waitUntil } from '@open-wc/testing';
-import { Router } from '../src/router.js';
-
+import { registerRoutes, redirect, RouterTesting } from '../src/router.js';
+import { loader as load1 } from './helpers/route-loader-1.js';
+import { loader as load2 } from './helpers/route-loader-2.js';
 import './helpers/main-view.js';
-import './helpers/loader-view.js';
-import './helpers/depend-view.js';
+import './helpers/param-query-view.js';
 
-let lastPage = {};
+let entryPoint;
+
+const initRouter = () => {
+    registerRoutes(
+        [
+            {
+                pattern: '/',
+                view: () => html`<p>Index</p>`,
+            },
+            {
+                pattern: '/user',
+                view: () => html`<p>User</p>`,
+            },
+            {
+                pattern: '/lazy',
+                loader: () => import('./helpers/lazy-comp.js'),
+                view: () => html`<lazy-view></lazy-view>`,
+            },
+            {
+                pattern: '/param/:test',
+                view: () => html`<route-view></route-view>`,
+            },
+            load1,
+            load2,
+        ],
+        { hashbang: true, customPage: true }
+    );
+};
 
 describe('Router', () => {
-    beforeEach(() => {
-        Router._hasConstructed = false;
+    beforeEach(async () => {
+        initRouter();
+        entryPoint = await fixture(html`<main-view></main-view>`);
+        redirect('/');
     });
 
     afterEach(() => {
-        lastPage.stop();
+        RouterTesting.reset();
     });
 
-    // test construction
-    it('Should construct the router', () => {
-        const router = new Router([], [], { customPage: true, hashbang: true });
-        lastPage = router.page;
-        expect(router).to.exist;
-    });
-
-    // test can't have multiple routers
     it('Should only construct one router', () => {
         try {
-            const router = new Router([], [], {
-                customPage: true,
-                hashbang: true,
-            });
-            lastPage = router.page;
-            new Router([], [], { customPage: true, hashbang: true });
+            initRouter();
         } catch (e) {
             expect(e.message).to.equal('May not construct multiple routers.');
         }
     });
 
-    // test renders active view
     it('Should show the active template associated with a route', async () => {
-        const el = await fixture(html`<main-view></main-view>`);
-        await el.updateComplete;
-        lastPage = el.router.page;
-
-        const p = el.shadowRoot.querySelector('p').innerText;
+        await entryPoint.updateComplete;
+        await waitUntil(() => entryPoint.shadowRoot.querySelector('p'));
+        const p = entryPoint.shadowRoot.querySelector('p').innerText;
         expect(p).to.equal('Index');
     });
 
-    // test component changes view
     it('Should change the route on redirect', async () => {
-        const el = await fixture(html`<main-view></main-view>`);
-        await el.updateComplete;
-        lastPage = el.router.page;
-
-        let p = el.shadowRoot.querySelector('p').innerText;
+        let p = entryPoint.shadowRoot.querySelector('p').innerText;
         expect(p).to.equal('Index');
 
-        lastPage.redirect('#!/user');
+        redirect('/user');
         await waitUntil(
-            () => el.shadowRoot.querySelector('p').innerText === 'User'
+            () => entryPoint.shadowRoot.querySelector('p').innerText === 'User'
         );
-        p = el.shadowRoot.querySelector('p').innerText;
+        p = entryPoint.shadowRoot.querySelector('p').innerText;
         expect(p).to.equal('User');
     });
 
-    // test component changes view
-    it('It should load routes from separate files', async () => {
-        const el = await fixture(html`<loader-view></loader-view>`);
-        await el.updateComplete;
-        lastPage = el.router.page;
-
-        lastPage.redirect('/');
+    it('Should load routes from separate files', async () => {
+        redirect('/load1');
         await waitUntil(
-            () => el.shadowRoot.querySelector('p').innerText === 'Index'
+            () =>
+                entryPoint.shadowRoot.querySelector('p').innerText === 'Load 1'
         );
-        let p = el.shadowRoot.querySelector('p').innerText;
-        expect(p).to.equal('Index');
+        let p = entryPoint.shadowRoot.querySelector('p').innerText;
+        expect(p).to.equal('Load 1');
 
-        lastPage.redirect('/user');
+        redirect('/load2');
         await waitUntil(
-            () => el.shadowRoot.querySelector('p').innerText === 'User'
+            () =>
+                entryPoint.shadowRoot.querySelector('p').innerText === 'Load 2'
         );
-        p = el.shadowRoot.querySelector('p').innerText;
-        expect(p).to.equal('User');
+        p = entryPoint.shadowRoot.querySelector('p').innerText;
+        expect(p).to.equal('Load 2');
     });
 
-    // test component changes view
-    it('It should lazy import route dependencies', async () => {
-        expect(customElements.get('lazy-view')).to.not.exist;
+    it('Should lazy import route dependencies', async () => {
+        redirect('/lazy');
 
-        const el = await fixture(html`<depend-view></depend-view>`);
-        await el.updateComplete;
-        lastPage = el.router.page;
-
-        lastPage.redirect('/');
         await waitUntil(() => customElements.get('lazy-view'));
-
         expect(customElements.get('lazy-view')).to.exist;
+    });
+
+    it('Should pass the context on redirect', async () => {
+        redirect('/param/hello?test=hello');
+        await waitUntil(() =>
+            entryPoint.shadowRoot.querySelector('route-view')
+        );
+        const paramQueryEl = entryPoint.shadowRoot.querySelector('route-view');
+
+        console.log(entryPoint);
+        await waitUntil(() => paramQueryEl.shadowRoot.querySelector('p'));
+
+        expect(paramQueryEl.shadowRoot.querySelector('p').innerText).to.equal(
+            'Param test: hello, Search Test: hello'
+        );
     });
 });
