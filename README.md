@@ -60,18 +60,18 @@ view: (params, search) => html`
 
 ### Multiple Route Loaders
 
-It is encouraged that you use a src folder structure like this.
+If that application you are building has many sub application it may be beneficial to organize your source folder like so.
 
 ```
 /src
 | /components
 |
-| /page1
-| | page1-view.js
+| /app1
+| | app1-view.js
 | | route-loader.js
 |
-| /page2
-| | page2-view.js
+| /app2
+| | app2-view.js
 | | route-loader.js
 |
 | entry-point.js
@@ -82,8 +82,8 @@ The main route-loader in the root of the src folder should import the route-load
 
 ```js
 /* src/route-loader.js */
-import { loader as page1Loader } from './page1/route-loader.js';
-import { loader as page2Loader } from './page2/route-loader.js';
+import { loader as app1Loader } from './app1/route-loader.js';
+import { loader as app2Loader } from './app2/route-loader.js';
 import { registerRoute } from '@brightspaceui-labs/router.js';
 
 registerRoute([
@@ -91,16 +91,16 @@ registerRoute([
         pattern: '/',
         view: () => html`<entry-point></entry-point>`
     },
-    page1Loader,
-    page2Loader
+    app1Loader,
+    app2Loader
 ])
 
 /* src/page1/route-loader.js */
 export const loader () => [
     {
-        pattern: '/page1',
-        loader: () => import('./page1-view.js'),
-        view: () => html`<page-1></page-1>`
+        pattern: '/app1',
+        loader: () => import('./app1-view.js'),
+        view: () => html`<app-1></app-1>`
     }
 ]
 ```
