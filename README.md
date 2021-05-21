@@ -58,6 +58,62 @@ view: (params, search) => html`
     </user-view>` 
 ```
 
+### Multiple Route Loaders
+
+It is encouraged that you use a src folder structure like this.
+
+```
+/src
+| /components
+|
+| /page1
+| | page1-view.js
+| | route-loader.js
+|
+| /page2
+| | page2-view.js
+| | route-loader.js
+|
+| entry-point.js
+| route-loader.js
+```
+
+The main route-loader in the root of the src folder should import the route-loader files in the subdirectories that separate the apps pages. It should look something like this.
+
+```js
+/* src/route-loader.js */
+import { loader as page1Loader } from './page1/route-loader.js';
+import { loader as page2Loader } from './page2/route-loader.js';
+import { registerRoute } from '@brightspaceui-labs/router.js';
+
+registerRoute([
+    {
+        pattern: '/',
+        view: () => html`<entry-point></entry-point>`
+    },
+    page1Loader,
+    page2Loader
+])
+
+/* src/page1/route-loader.js */
+export const () => [
+    {
+        pattern: '/page1',
+        loader: () => import('./page1-view.js'),
+        view: () => html`<page-1></page-1>`
+    }
+]
+```
+
+Route-loaders can be nested as far as you would like. You could have a folder path `/src/user/settings/profile/password` and have route-loaders at each point that import the next route-loader one level above. Therefore, 
+
+`/user/route-loader.js` could import and register   
+`/user/settings/route-loader.js` which in turn imports and registers   
+`/user/settings/profile/route-loaders.js`.
+
+and on and on...
+
+
 ## RouteReactor
 The RouteReactor is an early Reactive Controller that updates an element when the current route changes.
 

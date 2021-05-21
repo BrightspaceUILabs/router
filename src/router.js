@@ -6,10 +6,12 @@ let _lastOptions = {};
 
 const _handleRouteView = (context, next, r) => {
     if (r.view) {
-        context.view = r.view.apply(null, [
-            context.params,
-            context.searchParams,
-        ]);
+        const reducedContext = {
+            params: context.params,
+            search: context.searchParams,
+            path: context.pathname,
+        };
+        context.view = r.view(reducedContext);
         context.handled = true;
 
         next();

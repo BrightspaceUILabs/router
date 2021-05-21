@@ -31,12 +31,14 @@ const initRouter = () => {
             },
             {
                 pattern: '/param/:foo/:bar',
-                view: (params, search) =>
-                    html`<p>${params.foo}, ${params.bar}, ${search.test}</p>`,
+                view: ctx =>
+                    html`<p>
+                        ${ctx.params.foo}, ${ctx.params.bar}, ${ctx.search.test}
+                    </p>`,
             },
             {
                 pattern: '/search',
-                view: (_, search) => html`<p>${search.test}</p>`,
+                view: ctx => html`<p>${ctx.search.test}</p>`,
             },
             load1,
             load2,
