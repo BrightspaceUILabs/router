@@ -35,31 +35,12 @@ This is the first step. Registering routes builds the routing tree that the appl
 The view is also passed the url parameters and search object. For example:
 
 ```js 
-pattern: '/user/:id/:page'
-view: (params) => html`<user-view id=${params.id} page=${params.page}></user-view>` 
-```
-
-A `URLSearchParameters` object is always the last parameter of the view function:
-
-```js 
-pattern: '/user' // search: ?id=1&page=1&semester=1
-view: (_, search) => html`
-    <user-view 
-        ?id=${search.id} 
-        ?page=${search.page)} 
-        ?semester=${search.semester}>
-    </user-view>` 
-```
-
-They can also be used together:
-
-```js 
 pattern: '/user/:id/:page' // search: ?semester=1
 view: (params, search) => html`
     <user-view 
-        id=${params.id} 
+        id=${params.id}
         page=${params.page} 
-        ?semester=${search.semester}>
+        semester=${search.semester}> 
     </user-view>` 
 ```
 
