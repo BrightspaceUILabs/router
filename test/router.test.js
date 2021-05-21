@@ -123,14 +123,14 @@ describe('Router', () => {
         );
     });
 
-    it('Should pass parameters in left-to-right', async () => {
+    it('Should pass parameters', async () => {
         redirect('/param/beep/boop');
         await waitUntil(() => entryPoint.shadowRoot.querySelector('p'));
         const p = entryPoint.shadowRoot.querySelector('p').innerText;
         expect(p).to.eql('beep, boop,');
     });
 
-    it('Should pass parameters in left-to-right with search param at the end', async () => {
+    it('Should pass parameters with search param at the end', async () => {
         redirect('/param/zip/zap?test=zop');
         await waitUntil(() => entryPoint.shadowRoot.querySelector('p'));
         const p = entryPoint.shadowRoot.querySelector('p').innerText;
