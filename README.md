@@ -32,7 +32,7 @@ registerRoutes([
 
 This is the first step. Registering routes builds the routing tree that the application uses to determine which view to show at the entry-point. A routes view is a function that returns a lit-html template. This template gets rendered into your applications entry-point when the url matches the pattern.
 
-The view is also passed the url parameters and search object in definition order from left to right. For example:
+The view is also passed the url parameters and search object. For example:
 
 ```js 
 pattern: '/user/:id/:page'
