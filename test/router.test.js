@@ -17,6 +17,10 @@ const initRouter = () => {
                 view: () => html`<p>Index</p>`,
             },
             {
+                pattern: '/redirect',
+                to: '/user',
+            },
+            {
                 pattern: '/user',
                 view: () => html`<p>User</p>`,
             },
@@ -112,5 +116,14 @@ describe('Router', () => {
         expect(paramQueryEl.shadowRoot.querySelector('p').innerText).to.equal(
             'Param test: hello, Search Test: hello'
         );
+    });
+
+    it('Should redirect', async () => {
+        redirect('/redirect');
+        await entryPoint.updateComplete;
+        await waitUntil(() => entryPoint.shadowRoot.querySelector('p'));
+        const p = entryPoint.shadowRoot.querySelector('p').innerText;
+        expect(p).to.equal('User');
+        expect(window.location.pathname).to.include('/user');
     });
 });

@@ -19,6 +19,9 @@ const _handleRouteLoader = r => (context, next) => {
         r.loader().then(() => {
             _handleRouteView(context, next, r);
         });
+    } else if (r.pattern && r.to) {
+        activePage.redirect(r.pattern, r.to);
+        next();
     } else {
         _handleRouteView(context, next, r);
     }
