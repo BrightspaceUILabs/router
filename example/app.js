@@ -1,5 +1,5 @@
 import { css, html, LitElement } from 'lit-element';
-import { RouteReactor } from '../src/RouteReactor.js';
+import { RouteReactor } from '../RouteReactor.js';
 import './route-loader.js';
 
 export class App extends LitElement {

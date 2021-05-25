@@ -1,6 +1,6 @@
 import { html } from 'lit-element';
 import { ifDefined } from 'lit-html/directives/if-defined';
-import { redirect } from '../../src/router.js';
+import { redirect } from '../../router.js';
 
 export function loader() {
     return [
