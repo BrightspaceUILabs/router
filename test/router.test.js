@@ -33,6 +33,17 @@ const initRouter = () => {
                 pattern: '/param/:test',
                 view: () => html`<route-view></route-view>`,
             },
+            {
+                pattern: '/param/:foo/:bar',
+                view: ctx =>
+                    html`<p>
+                        ${ctx.params.foo}, ${ctx.params.bar}, ${ctx.search.test}
+                    </p>`,
+            },
+            {
+                pattern: '/search',
+                view: ctx => html`<p>${ctx.search.test}</p>`,
+            },
             load1,
             load2,
         ],
@@ -116,6 +127,27 @@ describe('Router', () => {
         expect(paramQueryEl.shadowRoot.querySelector('p').innerText).to.equal(
             'Param test: hello, Search Test: hello'
         );
+    });
+
+    it('Should pass parameters', async () => {
+        redirect('/param/beep/boop');
+        await waitUntil(() => entryPoint.shadowRoot.querySelector('p'));
+        const p = entryPoint.shadowRoot.querySelector('p').innerText;
+        expect(p).to.eql('beep, boop,');
+    });
+
+    it('Should pass parameters with search param at the end', async () => {
+        redirect('/param/zip/zap?test=zop');
+        await waitUntil(() => entryPoint.shadowRoot.querySelector('p'));
+        const p = entryPoint.shadowRoot.querySelector('p').innerText;
+        expect(p).to.eql('zip, zap, zop');
+    });
+
+    it('Should pass a search parameter without any url params', async () => {
+        redirect('/search?test=test');
+        await waitUntil(() => entryPoint.shadowRoot.querySelector('p'));
+        const p = entryPoint.shadowRoot.querySelector('p').innerText;
+        expect(p).to.eql('test');
     });
 
     it('Should redirect', async () => {

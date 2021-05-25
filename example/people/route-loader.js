@@ -7,19 +7,17 @@ export function loader() {
         {
             pattern: '/people',
             loader: () => import('./people.js'),
-            view: context => html` <test-people
+            view: ctx => html` <test-people
                 @filter-change="${e =>
                     redirect(`/example/people?filter=${e.detail.value}`)}"
-                filter="${ifDefined(context.searchParams.filter)}"
+                filter="${ifDefined(ctx.search.filter)}"
             ></test-people>`,
         },
         {
             pattern: '/people/:id',
             loader: () => import('./person.js'),
-            view: context =>
-                html`<test-person
-                    person-id="${context.params.id}"
-                ></test-person>`,
+            view: ctx =>
+                html`<test-person person-id="${ctx.params.id}"></test-person>`,
         },
     ];
 }

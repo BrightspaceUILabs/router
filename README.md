@@ -2,7 +2,21 @@
 
 A lit-element wrapper around Page.js.
 
-The aim of this library is to provide an easy way to define routes, lazy load the view, and update to changes in the route. 
+The aim of this library is to provide an easy way to define routes, lazy load the view, and update to changes in the route.
+
+> Note: this is a ["labs" component](https://github.com/BrightspaceUI/guide/wiki/Component-Tiers). While functional, these tasks are prerequisites to promotion to BrightspaceUI "official" status:
+>
+> - [ ] [Design organization buy-in](https://github.com/BrightspaceUI/guide/wiki/Before-you-build#working-with-design)
+> - [ ] [design.d2l entry](http://design.d2l/)
+> - [ ] [Architectural sign-off](https://github.com/BrightspaceUI/guide/wiki/Before-you-build#web-component-architecture)
+> - [ ] [Continuous integration](https://github.com/BrightspaceUI/guide/wiki/Testing#testing-continuously-with-travis-ci)
+> - [ ] [Cross-browser testing](https://github.com/BrightspaceUI/guide/wiki/Testing#cross-browser-testing-with-sauce-labs)
+> - [ ] [Unit tests](https://github.com/BrightspaceUI/guide/wiki/Testing#testing-with-polymer-test) (if applicable)
+> - [ ] [Accessibility tests](https://github.com/BrightspaceUI/guide/wiki/Testing#automated-accessibility-testing-with-axe)
+> - [ ] [Visual diff tests](https://github.com/BrightspaceUI/visual-diff)
+> - [ ] [Localization](https://github.com/BrightspaceUI/guide/wiki/Localization) with Serge (if applicable)
+> - [x] Demo page
+> - [ ] README documentation 
 
 ## Route Loading and Registration
 ```js
@@ -12,18 +26,93 @@ registerRoutes([
         loader: () => import('./home.js'),
         view: () => html`<test-home></test-home>`
     },
-    peopleRouteLoader,
-    placesRouteLoader,
+    {
+        pattern: '/example/:id',
+        view: params => html`<test-id id=${params.id}></test-id>`
+    },
+    {
+        pattern: '/example/foo/:bar',
+        view: (params, search) => html`
+            <test-foo bar=${params.bar}>
+                ${search.name}
+            </test-foo>`
+    }
     {
         pattern: '*',
-        view: (ctx) => html`<h1>Not Found ${ctx.pathName}</h1>`
+        view: () => html`<h1>Not Found</h1>`
     },
 ], options // the router configurations);
 ```
 
 This is the first step. Registering routes builds the routing tree that the application uses to determine which view to show at the entry-point. A routes view is a function that returns a lit-html template. This template gets rendered into your applications entry-point when the url matches the pattern.
 
-The view is also passed a page context object 
+The view is also passed the url parameters and search object. For example:
+
+```js 
+pattern: '/user/:id/:page' // search: ?semester=1
+view: (params, search) => html`
+    <user-view 
+        id=${params.id}
+        page=${params.page} 
+        semester=${search.semester}> 
+    </user-view>` 
+```
+
+### Multiple Route Loaders
+
+If that application you are building has many sub application it may be beneficial to organize your source folder like so.
+
+```
+/src
+| /components
+|
+| /app1
+| | app1-view.js
+| | route-loader.js
+|
+| /app2
+| | app2-view.js
+| | route-loader.js
+|
+| entry-point.js
+| route-loader.js
+```
+
+The main route-loader in the root of the src folder should import the route-loader files in the subdirectories that separate the apps pages. It should look something like this.
+
+```js
+/* src/route-loader.js */
+import { loader as app1Loader } from './app1/route-loader.js';
+import { loader as app2Loader } from './app2/route-loader.js';
+import { registerRoute } from '@brightspaceui-labs/router.js';
+
+registerRoute([
+    {
+        pattern: '/',
+        view: () => html`<entry-point></entry-point>`
+    },
+    app1Loader,
+    app2Loader
+])
+
+/* src/page1/route-loader.js */
+export const loader () => [
+    {
+        pattern: '/app1',
+        loader: () => import('./app1-view.js'),
+        view: () => html`<app-1></app-1>`
+    }
+]
+```
+
+Route-loaders can be nested as far as you would like. You could have a folder path `/src/user/settings/profile/password` and have route-loaders at each point that import the next route-loader one level above. Therefore, 
+
+`/user/route-loader.js` could import and register   
+`/user/settings/route-loader.js` which in turn imports and registers   
+`/user/settings/profile/route-loaders.js`.
+
+and on and on...
+
 
 ## RouteReactor
 The RouteReactor is an early Reactive Controller that updates an element when the current route changes.
@@ -52,7 +141,7 @@ class FooBar extends LitElement {
 
     render() {
         let userId = this.route.params.userId;
-        let orgId = this.route.search.get('org-unit');
+        let orgId = this.route.search['org-unit'];
 
         return html`<span> user: ${userId} orgUnit: ${orgId}</span>`;
     }
