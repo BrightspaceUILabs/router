@@ -84,6 +84,7 @@ describe('Router', () => {
     });
 
     it('Should change the route on redirect', async () => {
+        await waitUntil(() => entryPoint.shadowRoot.querySelector('p'));
         let p = entryPoint.shadowRoot.querySelector('p').innerText;
         expect(p).to.equal('Index');
 
@@ -96,6 +97,7 @@ describe('Router', () => {
     });
 
     it('Should load routes from separate files', async () => {
+        await waitUntil(() => entryPoint.shadowRoot.querySelector('p'));
         redirect('/load1');
         await waitUntil(
             () =>
@@ -159,7 +161,9 @@ describe('Router', () => {
     it('Should redirect', async () => {
         redirect('/redirect');
         await entryPoint.updateComplete;
-        await waitUntil(() => entryPoint.shadowRoot.querySelector('p'));
+        await waitUntil(
+            () => entryPoint.shadowRoot.querySelector('p') !== null
+        );
         const p = entryPoint.shadowRoot.querySelector('p').innerText;
         expect(p).to.equal('User');
         expect(window.location.pathname).to.include('/user');
@@ -168,7 +172,9 @@ describe('Router', () => {
     it('Should receive passed values from entry-point', async () => {
         redirect('/entry-prop');
         await entryPoint.updateComplete;
-        await waitUntil(() => entryPoint.shadowRoot.querySelector('p'));
+        await waitUntil(
+            () => entryPoint.shadowRoot.querySelector('p') !== null
+        );
         const p = entryPoint.shadowRoot.querySelector('p').innerText;
         expect(p).to.equal('Passed');
     });
