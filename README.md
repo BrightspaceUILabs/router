@@ -129,7 +129,7 @@ class EntryPoint extends LitElement {
 
     render() {
         const entry = { /* Values to pass to the views */};
-        return this.route.view(entry);
+        return this.route.renderView(entry);
     }
 }
 ```

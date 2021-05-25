@@ -14,8 +14,8 @@ class MainView extends LitElement {
     }
 
     render() {
-        return this.route.view
-            ? this.route.view({ main: this['main-prop'] })
+        return this.route.renderView
+            ? this.route.renderView({ main: this['main-prop'] })
             : '';
     }
 }
