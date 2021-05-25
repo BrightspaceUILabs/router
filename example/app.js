@@ -35,7 +35,7 @@ export class App extends LitElement {
                     </ul>
                 </nav>
             </aside>
-            <main>${this.route.view}</main>
+            <main>${this.route.view()}</main>
         `;
     }
 }
