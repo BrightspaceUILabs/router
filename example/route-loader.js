@@ -15,6 +15,10 @@ registerRoutes(
             loader: () => import('./home.js'),
             view: () => html`<test-home></test-home>`,
         },
+        {
+            pattern: '/home',
+            to: '/',
+        },
         peopleRouteLoader,
         placesRouteLoader,
     ],
