@@ -2,7 +2,7 @@ import { html } from 'lit-element';
 import { loader as peopleRouteLoader } from './people/route-loader.js';
 import { loader as placesRouteLoader } from './places/route-loader.js';
 
-import { registerRoutes } from '../src/router.js';
+import { registerRoutes } from '../router.js';
 
 registerRoutes(
     [

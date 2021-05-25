@@ -1,7 +1,7 @@
 /* eslint-disable no-return-assign */
 /* eslint-disable no-new */
 import { expect, fixture, html, waitUntil } from '@open-wc/testing';
-import { registerRoutes, redirect, RouterTesting } from '../src/router.js';
+import { registerRoutes, redirect, RouterTesting } from '../router.js';
 import { loader as load1 } from './helpers/route-loader-1.js';
 import { loader as load2 } from './helpers/route-loader-2.js';
 import './helpers/main-view.js';

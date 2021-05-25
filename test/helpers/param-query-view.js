@@ -1,5 +1,5 @@
 import { LitElement, html } from 'lit-element';
-import { RouteReactor } from '../../src/RouteReactor.js';
+import { RouteReactor } from '../../RouteReactor.js';
 
 class ParamQueryView extends LitElement {
     static get properties() {
