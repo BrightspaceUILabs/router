@@ -15,7 +15,7 @@
     "prettier:write": "prettier \"**/*.js\" --write --ignore-path .gitignore",
     "start": "web-dev-server --node-resolve --open --watch --app-index example/index.html"
   },
-  "version": "0.1.0",
+  "version": "1.0.0",
   "dependencies": {
     "@brightspace-ui/core": "^1.131.2",
     "@open-wc/dedupe-mixin": "^1.3.0",
@@ -60,5 +60,5 @@
   "files": [
     "./src/router.js",
     "./src/RouteReactor.js"
-  ] 
+  ]
 }
