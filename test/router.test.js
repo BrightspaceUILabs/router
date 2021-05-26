@@ -46,7 +46,7 @@ const initRouter = () => {
             },
             {
                 pattern: '/entry-prop',
-                view: ctx => html`<p>${ctx.entry.main}</p>`,
+                view: ctx => html`<p>${ctx.options.main}</p>`,
             },
             load1,
             load2,

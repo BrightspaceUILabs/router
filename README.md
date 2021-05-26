@@ -49,13 +49,13 @@ This is the first step. Registering routes builds the routing tree that the appl
 The view is given a context object that contains:
  - params: The URL parameters
  - search: The Search Query values
- - entry: An object passed by the entry-point. It is `undefined` if given nothing.
+ - options: An object passed by the entry-point. It is an empty object if given nothing.
 
 ```js 
 pattern: '/user/:id/:page' // search: ?semester=1
 view: ctx => html`
     <user-view 
-        id=${ctx.params.id}
+        id=${ctx.options.id}
         page=${ctx.params.page} 
         semester=${ctx.search.semester}> 
     </user-view>` 
@@ -128,8 +128,8 @@ class EntryPoint extends LitElement {
     }
 
     render() {
-        const entry = { /* Values to pass to the views */};
-        return this.route.renderView(entry);
+        const options = { /* Options for the views. Can be used for attributes */};
+        return this.route.renderView(options);
     }
 }
 ```
