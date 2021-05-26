@@ -9,7 +9,7 @@ const _handleRouteView = (context, next, r) => {
         const reducedContext = {
             params: context.params,
             search: context.searchParams,
-            path: context.pathname,
+            path: context.path,
         };
         context.view = r.view(reducedContext);
         context.handled = true;
