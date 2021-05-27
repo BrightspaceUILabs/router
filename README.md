@@ -47,9 +47,14 @@ registerRoutes([
 This is the first step. Registering routes builds the routing tree that the application uses to determine which view to show at the entry-point. A routes view is a function that returns a lit-html template. This template gets rendered into your applications entry-point when the url matches the pattern.
 
 The view is given a context object that contains:
- - params: The URL parameters
- - search: The Search Query values
+ - params: The URL parameters.
+ - search: The Search Query values.
  - options: An object passed by the entry-point. It is an empty object if given nothing.
+ - path: Pathname and query string "/login?foo=bar" from Page.js.
+ - pathname: The pathname void of query string "/login" from Page.js.
+ - hash: The url hash "#hash=values".
+ - route: The route pattern given to the view in the router.
+ - title: The title in the push state.
 
 ```js 
 pattern: '/user/:id/:page' // search: ?semester=1

@@ -4,14 +4,20 @@ import page from 'page';
 let activePage = page;
 let _lastOptions = {};
 
+const createReducedContext = pageContext => ({
+    params: pageContext.params,
+    search: pageContext.searchParams,
+    path: pageContext.path,
+    pathname: pageContext.pathname,
+    hash: pageContext.hash,
+    route: pageContext.routePath,
+    title: pageContext.title,
+    options: {},
+});
+
 const _handleRouteView = (context, next, r) => {
     if (r.view) {
-        const reducedContext = {
-            params: context.params,
-            search: context.searchParams,
-            path: context.pathname,
-            options: {},
-        };
+        const reducedContext = createReducedContext(context);
         context.view = options => {
             reducedContext.options = options || {};
             return r.view(reducedContext);
