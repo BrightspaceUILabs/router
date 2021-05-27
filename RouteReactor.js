@@ -16,8 +16,7 @@ export class RouteReactor extends ContextReactor {
             // this.params = ctx.params;
             // this.search = ctx.searchParams;
         });
-        super.init();
-
         this.renderView = () => {};
+        super.init();
     }
 }
