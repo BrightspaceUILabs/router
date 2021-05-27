@@ -139,7 +139,7 @@ class EntryPoint extends LitElement {
 }
 ```
 
-It can also be used by a component that needs to listen to changes to the url.
+It can also be used by a component that needs to listen to changes to the url. The available properties are the same as the context object passed to the views above with the addition of `renderView()`.
 
 ```js
 class FooBar extends LitElement {

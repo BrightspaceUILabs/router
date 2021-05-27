@@ -4,7 +4,7 @@ import page from 'page';
 let activePage = page;
 let _lastOptions = {};
 
-const createReducedContext = pageContext => ({
+export const _createReducedContext = pageContext => ({
     params: pageContext.params,
     search: pageContext.searchParams,
     path: pageContext.path,
@@ -17,7 +17,7 @@ const createReducedContext = pageContext => ({
 
 const _handleRouteView = (context, next, r) => {
     if (r.view) {
-        const reducedContext = createReducedContext(context);
+        const reducedContext = _createReducedContext(context);
         context.view = options => {
             reducedContext.options = options || {};
             return r.view(reducedContext);
