@@ -28,13 +28,13 @@ registerRoutes([
     },
     {
         pattern: '/example/:id',
-        view: params => html`<test-id id=${params.id}></test-id>`
+        view: ctx => html`<test-id id=${ctx.params.id}></test-id>`
     },
     {
         pattern: '/example/foo/:bar',
-        view: (params, search) => html`
-            <test-foo bar=${params.bar}>
-                ${search.name}
+        view: (ctx) => html`
+            <test-foo bar=${ctx.params.bar}>
+                ${ctx.search.name}
             </test-foo>`
     }
     {
@@ -46,15 +46,18 @@ registerRoutes([
 
 This is the first step. Registering routes builds the routing tree that the application uses to determine which view to show at the entry-point. A routes view is a function that returns a lit-html template. This template gets rendered into your applications entry-point when the url matches the pattern.
 
-The view is also passed the url parameters and search object. For example:
+The view is given a context object that contains:
+ - params: The URL parameters
+ - search: The Search Query values
+ - options: An object passed by the entry-point. It is an empty object if given nothing.
 
 ```js 
 pattern: '/user/:id/:page' // search: ?semester=1
-view: (params, search) => html`
+view: ctx => html`
     <user-view 
-        id=${params.id}
-        page=${params.page} 
-        semester=${search.semester}> 
+        id=${ctx.options.id}
+        page=${ctx.params.page} 
+        semester=${ctx.search.semester}> 
     </user-view>` 
 ```
 
@@ -125,7 +128,8 @@ class EntryPoint extends LitElement {
     }
 
     render() {
-        return this.route.view;
+        const options = { /* Options for the views. Can be used for attributes */};
+        return this.route.renderView(options);
     }
 }
 ```

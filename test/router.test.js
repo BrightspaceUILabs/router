@@ -44,6 +44,10 @@ const initRouter = () => {
                 pattern: '/search',
                 view: ctx => html`<p>${ctx.search.test}</p>`,
             },
+            {
+                pattern: '/entry-prop',
+                view: ctx => html`<p>${ctx.options.main}</p>`,
+            },
             load1,
             load2,
         ],
@@ -54,7 +58,9 @@ const initRouter = () => {
 describe('Router', () => {
     beforeEach(async () => {
         initRouter();
-        entryPoint = await fixture(html`<main-view></main-view>`);
+        entryPoint = await fixture(
+            html`<main-view main-prop="Passed"></main-view>`
+        );
         redirect('/');
     });
 
@@ -78,6 +84,7 @@ describe('Router', () => {
     });
 
     it('Should change the route on redirect', async () => {
+        await waitUntil(() => entryPoint.shadowRoot.querySelector('p'));
         let p = entryPoint.shadowRoot.querySelector('p').innerText;
         expect(p).to.equal('Index');
 
@@ -90,6 +97,7 @@ describe('Router', () => {
     });
 
     it('Should load routes from separate files', async () => {
+        await waitUntil(() => entryPoint.shadowRoot.querySelector('p'));
         redirect('/load1');
         await waitUntil(
             () =>
@@ -153,9 +161,21 @@ describe('Router', () => {
     it('Should redirect', async () => {
         redirect('/redirect');
         await entryPoint.updateComplete;
-        await waitUntil(() => entryPoint.shadowRoot.querySelector('p'));
+        await waitUntil(
+            () => entryPoint.shadowRoot.querySelector('p') !== null
+        );
         const p = entryPoint.shadowRoot.querySelector('p').innerText;
         expect(p).to.equal('User');
         expect(window.location.pathname).to.include('/user');
+    });
+
+    it('Should receive passed values from entry-point', async () => {
+        redirect('/entry-prop');
+        await entryPoint.updateComplete;
+        await waitUntil(
+            () => entryPoint.shadowRoot.querySelector('p') !== null
+        );
+        const p = entryPoint.shadowRoot.querySelector('p').innerText;
+        expect(p).to.equal('Passed');
     });
 });
