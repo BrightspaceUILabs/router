@@ -3,6 +3,7 @@ import page from 'page';
 
 let activePage = page;
 let _lastOptions = {};
+let _lastContext = {};
 
 export const _createReducedContext = pageContext => ({
     params: pageContext.params,
@@ -14,6 +15,13 @@ export const _createReducedContext = pageContext => ({
     title: pageContext.title,
     options: {},
 });
+
+const _storeCtx = () => {
+    activePage('*', (context, next) => {
+        _lastContext = context;
+        next();
+    });
+};
 
 const _handleRouteView = (context, next, r) => {
     if (r.view) {
@@ -85,6 +93,7 @@ export const registerRoutes = (routes, options) => {
         next();
     });
     _registerRoutes(routes);
+    _storeCtx();
 };
 
 const addMiddleware = callback => {
@@ -99,16 +108,22 @@ export const redirect = path => {
 };
 
 export class ContextReactor {
-    constructor(host, callback) {
+    constructor(host, callback, initialize) {
         ContextReactor.listeners.push({ host, callback });
 
         if (ContextReactor.listeners.length === 1) {
             addMiddleware(ctx => {
                 ContextReactor.listeners.forEach(listener => {
                     listener.callback(ctx);
-                    listener.host.requestUpdate();
+                    if (listener.host) {
+                        listener.host.requestUpdate();
+                    }
                 });
             });
+        }
+        // initialize the listener with the context from the last run
+        if (initialize) {
+            initialize(_lastContext);
         }
     }
 
