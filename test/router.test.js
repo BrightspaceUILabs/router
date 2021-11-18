@@ -1,6 +1,6 @@
 /* eslint-disable no-return-assign */
 /* eslint-disable no-new */
-import { expect, fixture, html, waitUntil } from '@open-wc/testing';
+import { aTimeout, expect, fixture, html, waitUntil } from '@open-wc/testing';
 import { registerRoutes, redirect, RouterTesting } from '../router.js';
 import { loader as load1 } from './helpers/route-loader-1.js';
 import { loader as load2 } from './helpers/route-loader-2.js';
@@ -161,6 +161,7 @@ describe('Router', () => {
     it('Should redirect', async () => {
         redirect('/redirect');
         await entryPoint.updateComplete;
+        await aTimeout(50);
         await waitUntil(
             () => entryPoint.shadowRoot.querySelector('p') !== null
         );

@@ -115,7 +115,8 @@ export class ContextReactor {
             addMiddleware(ctx => {
                 ContextReactor.listeners.forEach(listener => {
                     listener.callback(ctx);
-                    if (listener.host) {
+                    // call requestUpdate only for known routes when ctx.handled is truthy
+                    if (listener.host && ctx.handled) {
                         listener.host.requestUpdate();
                     }
                 });
