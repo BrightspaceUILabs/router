@@ -200,6 +200,7 @@ describe('Page Routing', () => {
 
 ## Helpers
 
+
 ### Redirecting
 
 Page.js will hook into any `<a>` tags and run the redirect but if you want to redirect in javascript you can use.
