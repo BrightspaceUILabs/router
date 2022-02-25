@@ -15,7 +15,7 @@
     "prettier:write": "prettier \"**/*.js\" --write --ignore-path .gitignore",
     "start": "web-dev-server --node-resolve --open --watch --app-index example/index.html"
   },
-  "version": "1.0.11",
+  "version": "1.0.12",
   "dependencies": {
     "lit-element": "^3",
     "lit-html": "^2",
