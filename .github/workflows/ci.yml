@@ -2,30 +2,30 @@ name: D2L-Router
 on: pull_request
 jobs:
 
-  lint:
-    timeout-minutes: 5
-    runs-on: ubuntu-latest
-    steps:
-      - uses: Brightspace/third-party-actions@actions/checkout
-      - uses: Brightspace/third-party-actions@actions/setup-node
-        with:
-          node-version: 14.x
-      - name: Install dependencies
-        run: npm install
-      - name: Linting
-        run: npm run lint
-  sauce:
+  test:
     timeout-minutes: 15
     runs-on: ubuntu-latest
     steps:
       - uses: Brightspace/third-party-actions@actions/checkout
       - uses: Brightspace/third-party-actions@actions/setup-node
         with:
-          node-version: 14.x
+          node-version-file: .nvmrc
+
       - name: Install dependencies
-        run: npm install
-      - name: SauceLabs Tests
-        run: npm run test:sauce
-        env:
-          SAUCE_USERNAME: Desire2Learn
-          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY_DESIRE2LEARN }}
+        uses: Brightspace/third-party-actions@actions/cache
+        id: playwright-cache
+        with:
+          path: |
+            ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
+      - run: npm install
+      - run: npx playwright install --with-deps
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+      - run: npx playwright install-deps
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+
+      - name: Linting
+        run: npm run lint
+
+      - name: Unit Tests (cross-browser)
+        run: npm run test:headless:ci
