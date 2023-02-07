@@ -26,9 +26,9 @@ const _storeCtx = () => {
 const _handleRouteView = (context, next, r) => {
     if (r.view) {
         const reducedContext = _createReducedContext(context);
-        context.view = options => {
+        context.view = (host, options) => {
             reducedContext.options = options || {};
-            return r.view(reducedContext);
+            return r.view.call(host, reducedContext);
         };
         context.handled = true;
 
