@@ -10,7 +10,9 @@ export class RouteReactor extends ContextReactor {
                 this[ctxKey] = reduced[ctxKey];
             });
 
-            this.renderView = ctx.view ? ctx.view : () => {};
+            this.renderView = ctx.view
+                ? opts => ctx.view(host, opts)
+                : () => {};
 
             // this.path = ctx.pathname;
             // this.params = ctx.params;

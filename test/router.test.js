@@ -48,6 +48,12 @@ const initRouter = () => {
                 pattern: '/entry-prop',
                 view: ctx => html`<p>${ctx.options.main}</p>`,
             },
+            {
+                pattern: '/entry-this',
+                view() {
+                    return html`<p>${this['main-prop']}</p>`;
+                },
+            },
             load1,
             load2,
         ],
@@ -172,6 +178,16 @@ describe('Router', () => {
 
     it('Should receive passed values from entry-point', async () => {
         redirect('/entry-prop');
+        await entryPoint.updateComplete;
+        await waitUntil(
+            () => entryPoint.shadowRoot.querySelector('p') !== null
+        );
+        const p = entryPoint.shadowRoot.querySelector('p').innerText;
+        expect(p).to.equal('Passed');
+    });
+
+    it('Should receive entry-point as this', async () => {
+        redirect('/entry-this');
         await entryPoint.updateComplete;
         await waitUntil(
             () => entryPoint.shadowRoot.querySelector('p') !== null
