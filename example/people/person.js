@@ -1,4 +1,4 @@
-import { html, LitElement } from 'lit-element';
+import { html, LitElement } from 'lit';
 import { people } from './people.js';
 
 export class Person extends LitElement {

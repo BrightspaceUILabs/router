@@ -10,7 +10,6 @@ jobs:
       - uses: Brightspace/third-party-actions@actions/setup-node
         with:
           node-version-file: .nvmrc
-
       - name: Install dependencies
         uses: Brightspace/third-party-actions@actions/cache
         id: playwright-cache
