@@ -11,7 +11,6 @@
     "format": "eslint --ext .js,.html . --fix --ignore-path .gitignore && prettier \"**/*.js\" --write --ignore-path .gitignore",
     "test:headless": "web-test-runner --files \"./test/**/*.test.js\" --node-resolve",
     "test:headless:watch": "web-test-runner --files \"./test/**/*.test.js\" --node-resolve --watch",
-    "test:headless:ci": "web-test-runner --files \"./test/**/*.test.js\" --playwright --browsers chromium firefox webkit",
     "prettier:write": "prettier \"**/*.js\" --write --ignore-path .gitignore",
     "start": "web-dev-server --node-resolve --open --watch --app-index example/index.html"
   },
