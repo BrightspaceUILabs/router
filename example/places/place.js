@@ -1,4 +1,4 @@
-import { html, LitElement } from 'lit-element';
+import { html, LitElement } from 'lit';
 import { places } from './places.js';
 
 export class Place extends LitElement {

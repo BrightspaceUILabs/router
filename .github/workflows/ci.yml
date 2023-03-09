@@ -10,22 +10,14 @@ jobs:
       - uses: Brightspace/third-party-actions@actions/setup-node
         with:
           node-version-file: .nvmrc
-
       - name: Install dependencies
-        uses: Brightspace/third-party-actions@actions/cache
-        id: playwright-cache
-        with:
-          path: |
-            ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
-      - run: npm install
-      - run: npx playwright install --with-deps
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-      - run: npx playwright install-deps
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: |
+          npm install
+          npm install @web/test-runner-playwright --no-save
+          npx playwright install-deps
 
       - name: Linting
         run: npm run lint
 
       - name: Unit Tests (cross-browser)
-        run: npm run test:headless:ci
+        run: npx web-test-runner --files "./test/**/*.test.js" --node-resolve --playwright --browsers chromium firefox webkit

@@ -1,4 +1,4 @@
-import { LitElement } from 'lit-element';
+import { LitElement } from 'lit';
 import { RouteReactor } from '../../RouteReactor.js';
 
 class MainView extends LitElement {

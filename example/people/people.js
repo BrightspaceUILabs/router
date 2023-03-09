@@ -1,5 +1,5 @@
 /* eslint-disable lit-a11y/no-invalid-change-handler */
-import { html, LitElement } from 'lit-element';
+import { html, LitElement } from 'lit';
 
 export const people = [
     {

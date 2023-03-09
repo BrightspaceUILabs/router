@@ -1,5 +1,5 @@
-import { html } from 'lit-element';
-import { ifDefined } from 'lit-html/directives/if-defined.js';
+import { html } from 'lit';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { redirect } from '../../router.js';
 
 export function loader() {

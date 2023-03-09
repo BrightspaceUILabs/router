@@ -1,4 +1,4 @@
-import { html } from 'lit-element';
+import { html } from 'lit';
 import { loader as peopleRouteLoader } from './people/route-loader.js';
 import { loader as placesRouteLoader } from './places/route-loader.js';
 
