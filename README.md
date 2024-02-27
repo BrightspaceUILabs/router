@@ -45,6 +45,16 @@ registerRoutes([
 
 This is the first step. Registering routes builds the routing tree that the application uses to determine which view to show at the entry-point. A routes view is a function that returns a lit-html template. This template gets rendered into your applications entry-point when the url matches the pattern.
 
+### Route options
+
+Each route must be registered as an object with these properties:
+- pattern (required): The Page.js route pattern on which to match
+- loader (optional): Initial loading to perform before rendering the view; must return a Promise
+- view (optional): Function that returns a lit-html template to render
+- to (optional): String indicating a redirect path, using Page.js `redirect(fromPath, toPath)`
+
+### View context
+
 The view is given a context object that contains:
  - params: The URL parameters.
  - search: The Search Query values.
