@@ -13,6 +13,7 @@ export const _createReducedContext = pageContext => ({
     hash: pageContext.hash,
     route: pageContext.routePath,
     title: pageContext.title,
+    state: pageContext.state,
     options: {},
 });
 
