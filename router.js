@@ -115,8 +115,16 @@ const addMiddleware = callback => {
     });
 };
 
+// Triggers navigation to the specified route path.
+// Creates a new entry in the browser's history stack.
+export const navigate = path => {
+    activePage.show(path);
+};
+
+// Triggers navigation to the specified route path.
+// Replaces the current entry in the browser's history stack.
 export const redirect = path => {
-    activePage(path);
+    activePage.redirect(path);
 };
 
 export class ContextReactor {
