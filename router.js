@@ -39,13 +39,25 @@ const _handleRouteView = (context, next, r) => {
 };
 
 const _handleRouteLoader = r => (context, next) => {
+    const enableRouteOrderFix = _lastOptions?.enableRouteOrderFix ?? false;
+
+    // Skip further pattern matches if the route has already been handled
+    if (enableRouteOrderFix && context.handled) {
+        next();
+        return;
+    }
+
     if (r.loader) {
         r.loader().then(() => {
             _handleRouteView(context, next, r);
         });
     } else if (r.pattern && r.to) {
-        activePage.redirect(r.pattern, r.to);
-        next();
+        if (enableRouteOrderFix) {
+            activePage.redirect(r.to);
+        } else {
+            activePage.redirect(r.pattern, r.to);
+            next();
+        }
     } else {
         _handleRouteView(context, next, r);
     }
@@ -103,8 +115,16 @@ const addMiddleware = callback => {
     });
 };
 
+// Triggers navigation to the specified route path.
+// Creates a new entry in the browser's history stack.
+export const navigate = path => {
+    activePage.show(path);
+};
+
+// Triggers navigation to the specified route path.
+// Replaces the current entry in the browser's history stack.
 export const redirect = path => {
-    activePage(path);
+    activePage.redirect(path);
 };
 
 export class ContextReactor {

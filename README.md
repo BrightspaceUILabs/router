@@ -15,7 +15,7 @@ The aim of this library is to provide an easy way to define routes, lazy load th
 > - [ ] [Visual diff tests](https://daylight.d2l.dev/developing/testing/visual-difference/)
 > - [ ] Localization with Serge (if applicable)
 > - [x] Demo page
-> - [ ] README documentation 
+> - [ ] README documentation
 
 ## Route Loading and Registration
 ```js
@@ -45,6 +45,16 @@ registerRoutes([
 
 This is the first step. Registering routes builds the routing tree that the application uses to determine which view to show at the entry-point. A routes view is a function that returns a lit-html template. This template gets rendered into your applications entry-point when the url matches the pattern.
 
+### Route options
+
+Each route must be registered as an object with these properties:
+- pattern (required): The Page.js route pattern on which to match
+- loader (optional): Initial loading to perform before rendering the view; must return a Promise
+- view (optional): Function that returns a lit-html template to render
+- to (optional): String indicating a redirect path, using Page.js `redirect(fromPath, toPath)`
+
+### View context
+
 The view is given a context object that contains:
  - params: The URL parameters.
  - search: The Search Query values.
@@ -55,14 +65,14 @@ The view is given a context object that contains:
  - route: The route pattern given to the view in the router.
  - title: The title in the push state.
 
-```js 
+```js
 pattern: '/user/:id/:page' // search: ?semester=1
 view: ctx => html`
-    <user-view 
+    <user-view
         id=${ctx.options.id}
-        page=${ctx.params.page} 
-        semester=${ctx.search.semester}> 
-    </user-view>` 
+        page=${ctx.params.page}
+        semester=${ctx.search.semester}>
+    </user-view>`
 ```
 
 ### Multiple Route Loaders
@@ -112,10 +122,10 @@ export const loader () => [
 ]
 ```
 
-Route-loaders can be nested as far as you would like. You could have a folder path `/src/user/settings/profile/password` and have route-loaders at each point that import the next route-loader one level above. Therefore, 
+Route-loaders can be nested as far as you would like. You could have a folder path `/src/user/settings/profile/password` and have route-loaders at each point that import the next route-loader one level above. Therefore,
 
-`/user/route-loader.js` could import and register   
-`/user/settings/route-loader.js` which in turn imports and registers   
+`/user/route-loader.js` could import and register
+`/user/settings/route-loader.js` which in turn imports and registers
 `/user/settings/profile/route-loaders.js`.
 
 and on and on...
@@ -162,7 +172,7 @@ class FooBar extends LitElement {
 
 ```bash
 npm i
-npm run start 
+npm run start
 ```
 
 ### Testing
@@ -171,13 +181,13 @@ npm run start
 npm test
 ```
 
-The repo is based on the @open-wc template and comes with husky. Testing will run each time you commit. Failed tests may keep you from pushing. Prettier is also used to format the code. You may need to run 
+The repo is based on the @open-wc template and comes with husky. Testing will run each time you commit. Failed tests may keep you from pushing. Prettier is also used to format the code. You may need to run
 
 ```
 npx run prettier:write
 ```
 
-to silence any Prettier related errors. Husky runs the above command on commit so it is probably unnecessary. 
+to silence any Prettier related errors. Husky runs the above command on commit so it is probably unnecessary.
 
 For testing page routing in your application we recommend using this template.
 
@@ -186,7 +196,7 @@ describe('Page Routing', () => {
     beforeEach(async () => {
         initRouter(); // Either initialize your routes here or import a file that calls routeRegister and make a way to recall it.
         entryPoint = await fixture(html`<!-- Your ViewReactor component here -->`);
-        redirect('/'); // Reset tests back to the index, clears the url
+        navigate('/'); // Reset tests back to the index, clears the url
     });
 
     afterEach(() => {
@@ -197,11 +207,25 @@ describe('Page Routing', () => {
 });
 ```
 
+### Versioning and Releasing
+
+This repo is configured to use `semantic-release`. Commits prefixed with `fix:` and `feat:` will trigger patch and minor releases when merged to `main`.
+
+To learn how to create major releases and release from maintenance branches, refer to the [semantic-release GitHub Action](https://github.com/BrightspaceUI/actions/tree/main/semantic-release) documentation.
+
 ## Helpers
 
-### Redirecting
+### Navigating and Redirecting
 
-Page.js will hook into any `<a>` tags and run the redirect but if you want to redirect in javascript you can use.
+Page.js will hook into any `<a>` tags and handle the navigation but if you want to navigate in javascript you can use `navigate(path)`:
+
+```js
+import { navigate } from '@brightspace-ui-labs/router';
+
+navigate('/');
+```
+
+If you wish to programmatically redirect to a page and have the previous history item be replaced with the new one, you can use `redirect(path)`:
 
 ```js
 import { redirect } from '@brightspace-ui-labs/router';
@@ -213,7 +237,7 @@ redirect('/');
 
 Options are the second parameter in the registerRoutes functions. The two tables below encompasses all of the attributes that the options object can use.
 
-The configurable page.js options are   
+The configurable page.js options are
 
 | Name                |                               Description                               | Default |
 | :------------------ | :---------------------------------------------------------------------: | ------: |
