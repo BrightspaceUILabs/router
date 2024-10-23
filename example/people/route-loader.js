@@ -1,6 +1,6 @@
 import { html } from 'lit';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { redirect } from '../../router.js';
+import { redirect } from '../../index.js';
 
 function handleFilterChange(e) {
 	redirect(`/example/people?filter=${e.detail.value}`);

@@ -1,5 +1,5 @@
 import { LitElement } from 'lit';
-import { RouteReactor } from '../../RouteReactor.js';
+import { RouteReactor } from '../../index.js';
 
 class MainView extends LitElement {
 	static get properties() {
