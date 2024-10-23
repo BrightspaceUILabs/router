@@ -6,13 +6,10 @@
   "main": "router.js",
   "repository": "https://github.com/BrightspaceUILabs/router.git",
   "scripts": {
-    "test": "npm run lint && npm run test:headless",
-    "lint": "eslint --ext .js,.html . --ignore-path .gitignore && prettier \"**/*.js\" --check --ignore-path .gitignore",
-    "format": "eslint --ext .js,.html . --fix --ignore-path .gitignore && prettier \"**/*.js\" --write --ignore-path .gitignore",
-    "test:headless": "web-test-runner --files \"./test/**/*.test.js\" --node-resolve",
-    "test:headless:watch": "web-test-runner --files \"./test/**/*.test.js\" --node-resolve --watch",
-    "prettier:write": "prettier \"**/*.js\" --write --ignore-path .gitignore",
-    "start": "web-dev-server --node-resolve --open --watch --app-index example/index.html"
+    "lint": "eslint . --ext .js,.html",
+    "start": "web-dev-server --node-resolve --open --watch --app-index example/index.html",
+    "test": "npm run lint && npm run test:unit",
+    "test:unit": "d2l-test-runner"
   },
   "version": "3.1.0",
   "dependencies": {
@@ -20,32 +17,10 @@
     "page": "^1"
   },
   "devDependencies": {
-    "@open-wc/eslint-config": "^4",
-    "@open-wc/testing": "^3",
-    "@web/dev-server": "^0.1",
-    "@web/test-runner": "^0.15",
-    "deepmerge": "^4.2.2",
+    "@brightspace-ui/testing": "^1",
+    "@web/dev-server": "^0.4",
     "eslint": "^8",
-    "eslint-config-prettier": "^7",
-    "husky": "^4.3.8",
-    "lint-staged": "^10.5.4",
-    "prettier": "^2.2.1"
-  },
-  "prettier": {
-    "singleQuote": true,
-    "arrowParens": "avoid",
-    "tabWidth": 4
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "*.js": [
-      "eslint --fix",
-      "prettier --write"
-    ]
+    "eslint-config-brightspace": "^1"
   },
   "publishConfig": {
     "access": "public"

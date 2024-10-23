@@ -1,84 +1,109 @@
-# Router
+# @brightspace-ui-labs/lit-router
 
-A Lit wrapper around Page.js.
+A Lit wrapper around the [Page.js Router](https://visionmedia.github.io/page.js/).
 
-The aim of this library is to provide an easy way to define routes, lazy load the view, and update to changes in the route.
+The aim of this library is to provide an easy way to define routes, lazy load the view, and react to changes to the route.
 
-> Note: this is a ["labs" component](https://daylight.d2l.dev/developing/getting-started/component-tiers/). While functional, these tasks are prerequisites to promotion to BrightspaceUI "official" status:
->
-> - [ ] [Design organization buy-in](https://daylight.d2l.dev/developing/creating-component/before-building/#working-with-design)
-> - [ ] [Architectural sign-off](https://daylight.d2l.dev/developing/creating-component/before-building/#web-component-architecture)
-> - [ ] [Continuous integration](https://daylight.d2l.dev/developing/testing/tools/#continuous-integration)
-> - [ ] [Cross-browser testing](https://daylight.d2l.dev/developing/testing/cross-browser/)
-> - [ ] [Unit tests](https://daylight.d2l.dev/developing/testing/tools/) (if applicable)
-> - [ ] [Accessibility tests](https://daylight.d2l.dev/developing/testing/accessibility/)
-> - [ ] [Visual diff tests](https://daylight.d2l.dev/developing/testing/visual-difference/)
-> - [ ] Localization with Serge (if applicable)
-> - [x] Demo page
-> - [ ] README documentation
+## Installation
 
-## Route Loading and Registration
-```js
-registerRoutes([
-    {
-        pattern: '/example',
-        loader: () => import('./home.js'),
-        view: () => html`<test-home></test-home>`
-    },
-    {
-        pattern: '/example/:id',
-        view: ctx => html`<test-id id=${ctx.params.id}></test-id>`
-    },
-    {
-        pattern: '/example/foo/:bar',
-        view: (ctx) => html`
-            <test-foo bar=${ctx.params.bar}>
-                ${ctx.search.name}
-            </test-foo>`
-    }
-    {
-        pattern: '*',
-        view: () => html`<h1>Not Found</h1>`
-    },
-], options // the router configurations);
+Install from NPM:
+
+```shell
+npm install @brightspace-ui-labs/lit-router
 ```
 
-This is the first step. Registering routes builds the routing tree that the application uses to determine which view to show at the entry-point. A routes view is a function that returns a lit-html template. This template gets rendered into your applications entry-point when the url matches the pattern.
+## Usage
 
-### Route options
+### Route Registration
 
-Each route must be registered as an object with these properties:
-- pattern (required): The Page.js route pattern on which to match
-- loader (optional): Initial loading to perform before rendering the view; must return a Promise
-- view (optional): Function that returns a lit-html template to render
-- to (optional): String indicating a redirect path, using Page.js `redirect(fromPath, toPath)`
+Registering routes defines the routing table used when determining the view to render.
 
-### View context
-
-The view is given a context object that contains:
- - params: The URL parameters.
- - search: The Search Query values.
- - options: An object passed by the entry-point. It is an empty object if given nothing.
- - path: Pathname and query string "/login?foo=bar" from Page.js.
- - pathname: The pathname void of query string "/login" from Page.js.
- - hash: The url hash "#hash=values".
- - route: The route pattern given to the view in the router.
- - title: The title in the push state.
+When the URL matches a particular route's pattern, the `view` function is called and returns a Lit `html` literal to render.
 
 ```js
-pattern: '/user/:id/:page' // search: ?semester=1
-view: ctx => html`
+import { registerRoutes } from '@brightspace-ui-labs/lit-router';
+
+registerRoutes([
+  {
+    pattern: '/example',
+    loader: () => import('./home.js'),
+    view: () => html`<test-home></test-home>`
+  },
+  {
+    pattern: '/example/:id',
+    view: ctx => html`<test-id id=${ctx.params.id}></test-id>`
+  },
+  {
+    pattern: '/example/foo/:bar',
+    view: ctx => html`
+      <test-foo bar=${ctx.params.bar}>
+        ${ctx.search.name}
+      </test-foo>
+    `
+  }
+], options);
+```
+
+#### Route Properties
+
+Each route has the following properties:
+- `pattern` (required): The Page.js route pattern on which to match
+- `loader` (optional): Allows for lazy-loading dependencies (e.g. importing view files) before rendering the view; must return a Promise
+- `view` (optional): Function that returns a Lit `html` literal to render
+- `to` (optional): String indicating a redirect path, using Page.js `redirect(fromPath, toPath)`
+
+#### View Context
+
+The view is provided a context object containing:
+ - `params`: URL segment parameters (e.g. `:id`)
+ - `search`: search query values
+ - `options`: object passed by the entry-point
+ - `path`: Pathname and query string (e.g. `"/login?foo=bar"`)
+ - `pathname`: Pathname void of query string (e.g. `"/login"`)
+ - `hash`: URL hash (e.g. `"#hash=values"`)
+ - `route`: route pattern given to the view in the router
+ - `title`: title in the push state
+
+Example:
+```js
+{
+  pattern: '/user/:id/:page' // search: ?semester=1
+  view: ctx => html`
     <user-view
         id=${ctx.options.id}
         page=${ctx.params.page}
         semester=${ctx.search.semester}>
-    </user-view>`
+    </user-view>
+  `
+}
 ```
+
+#### Options
+
+Options are the second parameter passed to `registerRoutes`. The two tables below encompasses all of the attributes that the options object can use.
+
+Page.js options:
+
+| Name                |                               Description                               | Default |
+| :------------------ | :---------------------------------------------------------------------: | ------: |
+| click               |                          bind to click events                           |    true |
+| popstate            |                            bind to popstate                             |    true |
+| dispatch            |                        perform initial dispatch                         |    true |
+| hashbang            |                           add #! before urls                            |   false |
+| decodeURLComponents | remove URL encoding from path components (query string, pathname, hash) |    true |
+
+Additional options:
+
+| Name       |                      Description                      | Default |
+| :--------- | :---------------------------------------------------: | ------: |
+| basePath   |       the path all other paths are appended too       |     '/' |
+| customPage | don't use the global page object (useful for testing) |   false |
 
 ### Multiple Route Loaders
 
-If that application you are building has many sub application it may be beneficial to organize your source folder like so.
+Some complex applications have many sub applications, and in these scenarios it may be beneficial to delegate to multiple route loaders.
 
+Example directory structure:
 ```
 /src
 | /components
@@ -95,7 +120,7 @@ If that application you are building has many sub application it may be benefici
 | route-loader.js
 ```
 
-The main route-loader in the root of the src folder should import the route-loader files in the subdirectories that separate the apps pages. It should look something like this.
+The main route-loader in the root of the `src` directory should import the route-loader files in the subdirectories.
 
 ```js
 /* src/route-loader.js */
@@ -104,120 +129,73 @@ import { loader as app2Loader } from './app2/route-loader.js';
 import { registerRoute } from '@brightspaceui-labs/router.js';
 
 registerRoute([
-    {
-        pattern: '/',
-        view: () => html`<entry-point></entry-point>`
-    },
-    app1Loader,
-    app2Loader
+  {
+    pattern: '/',
+    view: () => html`<entry-point></entry-point>`
+  },
+  app1Loader,
+  app2Loader
 ])
 
 /* src/page1/route-loader.js */
 export const loader () => [
-    {
-        pattern: '/app1',
-        loader: () => import('./app1-view.js'),
-        view: () => html`<app-1></app-1>`
-    }
+  {
+    pattern: '/app1',
+    loader: () => import('./app1-view.js'),
+    view: () => html`<app-1></app-1>`
+  }
 ]
 ```
 
-Route-loaders can be nested as far as you would like. You could have a folder path `/src/user/settings/profile/password` and have route-loaders at each point that import the next route-loader one level above. Therefore,
+### RouteReactor
 
-`/user/route-loader.js` could import and register
-`/user/settings/route-loader.js` which in turn imports and registers
-`/user/settings/profile/route-loaders.js`.
-
-and on and on...
-
-
-## RouteReactor
-The RouteReactor is an early Reactive Controller that updates an element when the current route changes.
+The `RouteReactor` is a [Reactive Controller](https://lit.dev/docs/composition/controllers/) responsible for re-rendering the nested view when the route changes.
 
 ```js
+import { RouteReactor } from '@brightspace-ui-labs/router';
+
 class EntryPoint extends LitElement {
-    constructor() {
-        super();
-        this.route = RouteReactor(this);
-    }
 
-    render() {
-        const options = { /* Options for the views. Can be used for attributes */};
-        return this.route.renderView(options);
-    }
+  constructor() {
+    super();
+    this.route = new RouteReactor(this);
+  }
+
+  render() {
+    // Options for the views. Can be used for attributes */
+    const options = { };
+    return this.route.renderView(options);
+  }
+
 }
 ```
 
-It can also be used by a component that needs to listen to changes to the url. The available properties are the same as the context object passed to the views above with the addition of `renderView()`.
+A `RouteReactor` can also be used to react to changes to the URL. The available properties are the same as the context object passed to the views above.
 
 ```js
+import { RouteReactor } from '@brightspace-ui-labs/router';
+
 class FooBar extends LitElement {
-    constructor() {
-        super();
-        this.route = RouteReactor(this);
-    }
 
-    render() {
-        let userId = this.route.params.userId;
-        let orgId = this.route.search['org-unit'];
+  constructor() {
+    super();
+    this.route = new RouteReactor(this);
+  }
 
-        return html`<span> user: ${userId} orgUnit: ${orgId}</span>`;
-    }
+  render() {
+    const userId = this.route.params.userId;
+    const orgId = this.route.search['org-unit'];
+    return html`<span> user: ${userId} orgUnit: ${orgId}</span>`;
+  }
+
 }
 ```
 
-## Contributing
+### Helpers
 
-### Running
+#### Navigating and Redirecting
 
-```bash
-npm i
-npm run start
-```
-
-### Testing
-
-```bash
-npm test
-```
-
-The repo is based on the @open-wc template and comes with husky. Testing will run each time you commit. Failed tests may keep you from pushing. Prettier is also used to format the code. You may need to run
-
-```
-npx run prettier:write
-```
-
-to silence any Prettier related errors. Husky runs the above command on commit so it is probably unnecessary.
-
-For testing page routing in your application we recommend using this template.
-
-```js
-describe('Page Routing', () => {
-    beforeEach(async () => {
-        initRouter(); // Either initialize your routes here or import a file that calls routeRegister and make a way to recall it.
-        entryPoint = await fixture(html`<!-- Your ViewReactor component here -->`);
-        navigate('/'); // Reset tests back to the index, clears the url
-    });
-
-    afterEach(() => {
-        RouterTesting.reset(); // creates a new router instance, clears any router related reactive controllers.
-    });
-
-    // Your tests here
-});
-```
-
-### Versioning and Releasing
-
-This repo is configured to use `semantic-release`. Commits prefixed with `fix:` and `feat:` will trigger patch and minor releases when merged to `main`.
-
-To learn how to create major releases and release from maintenance branches, refer to the [semantic-release GitHub Action](https://github.com/BrightspaceUI/actions/tree/main/semantic-release) documentation.
-
-## Helpers
-
-### Navigating and Redirecting
-
-Page.js will hook into any `<a>` tags and handle the navigation but if you want to navigate in javascript you can use `navigate(path)`:
+Page.js will hook into any `<a>` tags and handle the navigation automatically. However, to navigate manually use `navigate(path)`:
 
 ```js
 import { navigate } from '@brightspace-ui-labs/router';
@@ -225,7 +203,7 @@ import { navigate } from '@brightspace-ui-labs/router';
 navigate('/');
 ```
 
-If you wish to programmatically redirect to a page and have the previous history item be replaced with the new one, you can use `redirect(path)`:
+To programmatically redirect to a page and have the previous history item be replaced with the new one, use `redirect(path)`:
 
 ```js
 import { redirect } from '@brightspace-ui-labs/router';
@@ -233,26 +211,62 @@ import { redirect } from '@brightspace-ui-labs/router';
 redirect('/');
 ```
 
-## Options
+### Testing Routing in Your Application
 
-Options are the second parameter in the registerRoutes functions. The two tables below encompasses all of the attributes that the options object can use.
+For testing page routing in your application, this template is recommended:
 
-The configurable page.js options are
+```js
+describe('Page Routing', () => {
 
-| Name                |                               Description                               | Default |
-| :------------------ | :---------------------------------------------------------------------: | ------: |
-| click               |                          bind to click events                           |    true |
-| popstate            |                            bind to popstate                             |    true |
-| dispatch            |                        perform initial dispatch                         |    true |
-| hashbang            |                           add #! before urls                            |   false |
-| decodeURLComponents | remove URL encoding from path components (query string, pathname, hash) |    true |
+  beforeEach(async () => {
+    // Initialize the routes here or import a file
+    // that calls registerRoutes and expose a way to recall it
+    initRouter(); 
+    entryPoint = await fixture(html`<!-- Your ViewReactor component here -->`);
+    navigate('/'); // Reset tests back to the index, clears the url
+  });
 
+  afterEach(() => {
+    RouterTesting.reset(); // creates a new router instance, clears any router related reactive controllers.
+  });
 
-With the addition of
+  // Your tests here
 
-| Name       |                      Description                      | Default |
-| :--------- | :---------------------------------------------------: | ------: |
-| basePath   |       the path all other paths are appended too       |     '/' |
-| customPage | don't use the global page object (useful for testing) |   false |
+});
+```
 
+## Developing and Contributing
 
+After cloning the repo, run `npm install` to install dependencies.
+
+### Testing
+
+To run the full suite of tests:
+
+```shell
+npm test
+```
+
+Alternatively, tests can be selectively run:
+
+```shell
+# eslint
+npm run lint
+
+# unit tests
+npm run test:unit
+```
+
+### Running the demos
+
+To start a [@web/dev-server](https://modern-web.dev/docs/dev-server/overview/) that hosts the demo pages and tests:
+
+```shell
+npm start
+```
+
+### Versioning and Releasing
+
+This repo is configured to use `semantic-release`. Commits prefixed with `fix:` and `feat:` will trigger patch and minor releases when merged to `main`.
+
+To learn how to create major releases and release from maintenance branches, refer to the [semantic-release GitHub Action](https://github.com/BrightspaceUI/actions/tree/main/semantic-release) documentation.
