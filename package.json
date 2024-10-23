@@ -3,7 +3,7 @@
   "license": "Apache-2.0",
   "name": "@brightspace-ui-labs/lit-router",
   "description": "",
-  "main": "router.js",
+  "main": "index.js",
   "repository": "https://github.com/BrightspaceUILabs/router.git",
   "scripts": {
     "lint": "eslint . --ext .js,.html",
@@ -26,6 +26,7 @@
     "access": "public"
   },
   "files": [
+    "index.js",
     "router.js",
     "RouteReactor.js"
   ]
