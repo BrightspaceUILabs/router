@@ -126,9 +126,9 @@ The main route-loader in the root of the `src` directory should import the route
 /* src/route-loader.js */
 import { loader as app1Loader } from './app1/route-loader.js';
 import { loader as app2Loader } from './app2/route-loader.js';
-import { registerRoute } from '@brightspaceui-labs/router.js';
+import { registerRoutes } from '@brightspace-ui-labs/lit-router';
 
-registerRoute([
+registerRoutes([
   {
     pattern: '/',
     view: () => html`<entry-point></entry-point>`
@@ -152,7 +152,7 @@ export const loader () => [
 The `RouteReactor` is a [Reactive Controller](https://lit.dev/docs/composition/controllers/) responsible for re-rendering the nested view when the route changes.
 
 ```js
-import { RouteReactor } from '@brightspace-ui-labs/router';
+import { RouteReactor } from '@brightspace-ui-labs/lit-router/RouteReactor.js';
 
 class EntryPoint extends LitElement {
 
@@ -173,7 +173,7 @@ class EntryPoint extends LitElement {
 A `RouteReactor` can also be used to react to changes to the URL. The available properties are the same as the context object passed to the views above.
 
 ```js
-import { RouteReactor } from '@brightspace-ui-labs/router';
+import { RouteReactor } from '@brightspace-ui-labs/lit-router/RouteReactor.js';
 
 class FooBar extends LitElement {
 
@@ -198,7 +198,7 @@ class FooBar extends LitElement {
 Page.js will hook into any `<a>` tags and handle the navigation automatically. However, to navigate manually use `navigate(path)`:
 
 ```js
-import { navigate } from '@brightspace-ui-labs/router';
+import { navigate } from '@brightspace-ui-labs/lit-router';
 
 navigate('/');
 ```
@@ -206,7 +206,7 @@ navigate('/');
 To programmatically redirect to a page and have the previous history item be replaced with the new one, use `redirect(path)`:
 
 ```js
-import { redirect } from '@brightspace-ui-labs/router';
+import { redirect } from '@brightspace-ui-labs/lit-router';
 
 redirect('/');
 ```
