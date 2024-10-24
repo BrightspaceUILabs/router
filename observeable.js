@@ -5,6 +5,16 @@ export default class Observable {
 		this._previousData = null;
 	}
 
+	clear() {
+		this._observers.clear();
+	}
+
+	notify(data) {
+		this._observers.forEach(observer => observer(data));
+		this._hasTriggered = true;
+		this._previousData = data;
+	}
+
 	subscribe(observer) {
 		this._observers.set(observer, observer);
 		if (this._hasTriggered) {
@@ -14,15 +24,5 @@ export default class Observable {
 
 	unsubscribe(observer) {
 		this._observers.delete(observer);
-	}
-
-	notify(data) {
-		this._observers.forEach(observer => observer(data));
-		this._hasTriggered = true;
-		this._previousData = data;
-	}
-
-	clear() {
-		this._observers.clear();
 	}
 }

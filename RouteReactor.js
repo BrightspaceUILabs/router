@@ -8,6 +8,10 @@ export class RouteReactor {
 		this._contextReactor = new ContextReactor(host, this._updateState, this._updateState);
 	}
 
+	renderView(opts) {
+		return this._view?.(this.host, opts);
+	}
+
 	_updateState(ctx) {
 		const reduced = _createReducedContext(ctx);
 		Object.keys(reduced).forEach(ctxKey => {
@@ -15,9 +19,5 @@ export class RouteReactor {
 		});
 
 		this._view = ctx.view;
-	}
-
-	renderView(opts) {
-		return this._view?.(this.host, opts);
 	}
 }

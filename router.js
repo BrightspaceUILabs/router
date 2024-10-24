@@ -1,5 +1,5 @@
-import page from 'page';
 import Observable from './observeable.js';
+import page from 'page';
 
 let activePage = page;
 let _lastOptions = {};
@@ -26,7 +26,7 @@ const _addSearchParamsMiddleware = () => {
 		});
 		next();
 	});
-}
+};
 
 const _handleRouteView = (context, r) => {
 	if (r.view) {
@@ -118,15 +118,6 @@ export class ContextReactor {
 		this._onRouteChange = this._onRouteChange.bind(this);
 	}
 
-	_onRouteChange(context) {
-		if (this._initializing) {
-			this._initialize?.(context);
-		} else {
-			this._callback?.(context);
-			this.host.requestUpdate();
-		}
-	}
-
 	hostConnected() {
 		this._initializing = true;
 		_routeChangeObservable.subscribe(this._onRouteChange);
@@ -135,6 +126,15 @@ export class ContextReactor {
 
 	hostDisconnected() {
 		_routeChangeObservable.unsubscribe(this._onRouteChange);
+	}
+
+	_onRouteChange(context) {
+		if (this._initializing) {
+			this._initialize?.(context);
+		} else {
+			this._callback?.(context);
+			this.host.requestUpdate();
+		}
 	}
 }
 
