@@ -1,8 +1,8 @@
 import page from 'page';
+import Observable from './observeable.js';
 
 let activePage = page;
 let _lastOptions = {};
-let _lastContext = {};
 
 export const _createReducedContext = pageContext => ({
 	params: pageContext.params,
@@ -15,50 +15,39 @@ export const _createReducedContext = pageContext => ({
 	options: {},
 });
 
-const _storeCtx = () => {
+const _routeChangeObservable = new Observable();
+
+const _addSearchParamsMiddleware = () => {
 	activePage('*', (context, next) => {
-		_lastContext = context;
+		context.searchParams = {};
+		const searchParams = new URLSearchParams(context.querystring);
+		searchParams.forEach((value, key) => {
+			context.searchParams[key] = value;
+		});
 		next();
 	});
-};
+}
 
-const _handleRouteView = (context, next, r) => {
+const _handleRouteView = (context, r) => {
 	if (r.view) {
 		const reducedContext = _createReducedContext(context);
 		context.view = (host, options) => {
 			reducedContext.options = options || {};
 			return r.view.call(host, reducedContext);
 		};
-		context.handled = true;
-
-		next();
-	} else {
-		next();
+		_routeChangeObservable.notify(context);
 	}
 };
 
-const _handleRouteLoader = r => (context, next) => {
-	const enableRouteOrderFix = _lastOptions?.enableRouteOrderFix ?? false;
-
-	// Skip further pattern matches if the route has already been handled
-	if (enableRouteOrderFix && context.handled) {
-		next();
-		return;
-	}
-
+const _handleRouteLoader = r => (context) => {
 	if (r.loader) {
 		r.loader().then(() => {
-			_handleRouteView(context, next, r);
+			_handleRouteView(context, r);
 		});
 	} else if (r.pattern && r.to) {
-		if (enableRouteOrderFix) {
-			activePage.redirect(r.to);
-		} else {
-			activePage.redirect(r.pattern, r.to);
-			next();
-		}
+		activePage.redirect(r.to);
 	} else {
-		_handleRouteView(context, next, r);
+		_handleRouteView(context, r);
 	}
 };
 
@@ -97,23 +86,13 @@ export const registerRoutes = (routes, options) => {
 
 	configure(options);
 
-	activePage('*', (context, next) => {
-		context.searchParams = {};
-		const searchParams = new URLSearchParams(context.querystring);
-		searchParams.forEach((value, key) => {
-			context.searchParams[key] = value;
-		});
-		next();
-	});
-	_registerRoutes(routes);
-	_storeCtx();
-};
+	_addSearchParamsMiddleware();
 
-const addMiddleware = callback => {
-	activePage('*', (ctx, next) => {
-		callback(ctx);
-		next();
-	});
+	// Simulate the route order inversion issue by reversing the routes if the enableRouteOrderFix option is not enabled.
+	// TODO: Remove the reverse() call and the enableRouteOrderFix option once all consumers with a workaround have updated their implementation with the fix.
+	_registerRoutes(options.enableRouteOrderFix ? routes : routes.reverse());
+
+	activePage();
 };
 
 // Triggers navigation to the specified route path.
@@ -129,45 +108,42 @@ export const redirect = path => {
 };
 
 export class ContextReactor {
-
-	static reset() {
-		this.listeners = [];
-	}
-
 	constructor(host, callback, initialize) {
-		ContextReactor.listeners.push({ host, callback });
+		this.host = host;
+		this.host.addController(this);
 
-		if (ContextReactor.listeners.length === 1) {
-			addMiddleware(ctx => {
-				ContextReactor.listeners.forEach(listener => {
-					listener.callback(ctx);
-					// call requestUpdate only for known routes when ctx.handled is truthy
-					if (listener.host && ctx.handled) {
-						listener.host.requestUpdate();
-					}
-				});
-			});
-		}
-		// initialize the listener with the context from the last run
-		if (initialize) {
-			initialize(_lastContext);
+		this._callback = callback;
+		this._initialize = initialize;
+
+		this._onRouteChange = this._onRouteChange.bind(this);
+	}
+
+	_onRouteChange(context) {
+		if (this._initializing) {
+			this._initialize?.(context);
+		} else {
+			this._callback?.(context);
+			this.host.requestUpdate();
 		}
 	}
 
-	init() {
-		activePage();
+	hostConnected() {
+		this._initializing = true;
+		_routeChangeObservable.subscribe(this._onRouteChange);
+		this._initializing = false;
 	}
 
+	hostDisconnected() {
+		_routeChangeObservable.unsubscribe(this._onRouteChange);
+	}
 }
-
-ContextReactor.listeners = [];
 
 export const RouterTesting = {
 	reset: () => {
 		activePage.stop();
 		activePage = page.create();
 		hasRegistered = false;
-		ContextReactor.reset();
+		_routeChangeObservable.clear();
 	},
 
 	restart: () => {
