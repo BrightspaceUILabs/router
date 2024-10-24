@@ -221,7 +221,7 @@ describe('Page Routing', () => {
   beforeEach(async () => {
     // Initialize the routes here or import a file
     // that calls registerRoutes and expose a way to recall it
-    initRouter(); 
+    initRouter();
     entryPoint = await fixture(html`<!-- Your ViewReactor component here -->`);
     navigate('/'); // Reset tests back to the index, clears the url
   });
@@ -234,6 +234,39 @@ describe('Page Routing', () => {
 
 });
 ```
+
+## Known Issues
+
+### Route order inversion issue
+
+There's currently an issue with the way registered routes are processed that can cause the order of matching to appear to be inverted. This is not noticeable in many cases since it's often the case that only a single route will match regardless of the order. This does however come up when dealing with wildcard (`*`) routes (e.g. 404 redirect routes).
+
+If you notice that you have to put any routes with wildcards (`*`) before those without instead of after, this is the reason why.
+
+#### Issue Fix
+
+There is currently a fix available for this ordering issue, but it requires setting the `enableRouteOrderFix` option to `true`. Ex:
+
+```js
+registerRoutes([
+  {
+    pattern: '/home',
+    view: () => html`...`
+  },
+  {
+    pattern: '/404',
+    view: () => html`...`
+  },
+  {
+    pattern: '*',
+    to: '/404'
+  }
+], {
+  enableRouteOrderFix: true
+});
+```
+
+Note: The reason this is an opt-in fix is that a lot of existing implementations of lit-router have worked around this issue by putting the wildcard routes at the start, which would break if the issue were fixed for everyone automatically.
 
 ## Developing and Contributing
 
