@@ -126,9 +126,9 @@ The main route-loader in the root of the `src` directory should import the route
 /* src/route-loader.js */
 import { loader as app1Loader } from './app1/route-loader.js';
 import { loader as app2Loader } from './app2/route-loader.js';
-import { registerRoute } from '@brightspaceui-labs/router.js';
+import { registerRoutes } from '@brightspace-ui-labs/lit-router';
 
-registerRoute([
+registerRoutes([
   {
     pattern: '/',
     view: () => html`<entry-point></entry-point>`
@@ -152,7 +152,7 @@ export const loader () => [
 The `RouteReactor` is a [Reactive Controller](https://lit.dev/docs/composition/controllers/) responsible for re-rendering the nested view when the route changes.
 
 ```js
-import { RouteReactor } from '@brightspace-ui-labs/router';
+import { RouteReactor } from '@brightspace-ui-labs/lit-router';
 
 class EntryPoint extends LitElement {
 
@@ -173,7 +173,7 @@ class EntryPoint extends LitElement {
 A `RouteReactor` can also be used to react to changes to the URL. The available properties are the same as the context object passed to the views above.
 
 ```js
-import { RouteReactor } from '@brightspace-ui-labs/router';
+import { RouteReactor } from '@brightspace-ui-labs/lit-router';
 
 class FooBar extends LitElement {
 
@@ -198,7 +198,7 @@ class FooBar extends LitElement {
 Page.js will hook into any `<a>` tags and handle the navigation automatically. However, to navigate manually use `navigate(path)`:
 
 ```js
-import { navigate } from '@brightspace-ui-labs/router';
+import { navigate } from '@brightspace-ui-labs/lit-router';
 
 navigate('/');
 ```
@@ -206,7 +206,7 @@ navigate('/');
 To programmatically redirect to a page and have the previous history item be replaced with the new one, use `redirect(path)`:
 
 ```js
-import { redirect } from '@brightspace-ui-labs/router';
+import { redirect } from '@brightspace-ui-labs/lit-router';
 
 redirect('/');
 ```
@@ -221,7 +221,7 @@ describe('Page Routing', () => {
   beforeEach(async () => {
     // Initialize the routes here or import a file
     // that calls registerRoutes and expose a way to recall it
-    initRouter(); 
+    initRouter();
     entryPoint = await fixture(html`<!-- Your ViewReactor component here -->`);
     navigate('/'); // Reset tests back to the index, clears the url
   });
@@ -234,6 +234,39 @@ describe('Page Routing', () => {
 
 });
 ```
+
+## Known Issues
+
+### Route order inversion issue
+
+There's currently an issue with the way registered routes are processed that can cause the order of matching to appear to be inverted. This is not noticeable in many cases since it's often the case that only a single route will match regardless of the order. This does however come up when dealing with wildcard (`*`) routes (e.g. 404 redirect routes).
+
+If you notice that you have to put any routes with wildcards (`*`) before those without instead of after, this is the reason why.
+
+#### Issue Fix
+
+There is currently a fix available for this ordering issue, but it requires setting the `enableRouteOrderFix` option to `true`. Ex:
+
+```js
+registerRoutes([
+  {
+    pattern: '/home',
+    view: () => html`...`
+  },
+  {
+    pattern: '/404',
+    view: () => html`...`
+  },
+  {
+    pattern: '*',
+    to: '/404'
+  }
+], {
+  enableRouteOrderFix: true
+});
+```
+
+Note: The reason this is an opt-in fix is that a lot of existing implementations of lit-router have worked around this issue by putting the wildcard routes at the start, which would break if the issue were fixed for everyone automatically.
 
 ## Developing and Contributing
 

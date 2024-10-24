@@ -93,6 +93,8 @@ export const registerRoutes = (routes, options) => {
 	if (hasRegistered) throw new Error('May not construct multiple routers.');
 	hasRegistered = true;
 
+	if (!options.enableRouteOrderFix) console.warn('lit-router: The enableRouteOrderFix option is not enabled. This may cause issues with route handling. See here for details: https://github.com/BrightspaceUILabs/router/blob/main/README.md#route-order-inversion-issue');
+
 	configure(options);
 
 	activePage('*', (context, next) => {
