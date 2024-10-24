@@ -152,7 +152,7 @@ export const loader () => [
 The `RouteReactor` is a [Reactive Controller](https://lit.dev/docs/composition/controllers/) responsible for re-rendering the nested view when the route changes.
 
 ```js
-import { RouteReactor } from '@brightspace-ui-labs/lit-router/RouteReactor.js';
+import { RouteReactor } from '@brightspace-ui-labs/lit-router';
 
 class EntryPoint extends LitElement {
 
@@ -173,7 +173,7 @@ class EntryPoint extends LitElement {
 A `RouteReactor` can also be used to react to changes to the URL. The available properties are the same as the context object passed to the views above.
 
 ```js
-import { RouteReactor } from '@brightspace-ui-labs/lit-router/RouteReactor.js';
+import { RouteReactor } from '@brightspace-ui-labs/lit-router';
 
 class FooBar extends LitElement {
 
