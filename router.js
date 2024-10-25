@@ -17,17 +17,6 @@ export const _createReducedContext = pageContext => ({
 
 const _routeChangeObservable = new Observable();
 
-const _addSearchParamsMiddleware = () => {
-	activePage('*', (context, next) => {
-		context.searchParams = {};
-		const searchParams = new URLSearchParams(context.querystring);
-		searchParams.forEach((value, key) => {
-			context.searchParams[key] = value;
-		});
-		next();
-	});
-};
-
 const _handleRouteView = (context, r) => {
 	if (r.view) {
 		const reducedContext = _createReducedContext(context);
@@ -86,7 +75,14 @@ export const registerRoutes = (routes, options) => {
 
 	configure(options);
 
-	_addSearchParamsMiddleware();
+	activePage('*', (context, next) => {
+		context.searchParams = {};
+		const searchParams = new URLSearchParams(context.querystring);
+		searchParams.forEach((value, key) => {
+			context.searchParams[key] = value;
+		});
+		next();
+	});
 
 	// Simulate the route order inversion issue by reversing the routes if the enableRouteOrderFix option is not enabled.
 	// TODO: Remove the reverse() call and the enableRouteOrderFix option once all consumers with a workaround have updated their implementation with the fix.
@@ -119,9 +115,7 @@ export class ContextReactor {
 	}
 
 	hostConnected() {
-		this._initializing = true;
-		_routeChangeObservable.subscribe(this._onRouteChange);
-		this._initializing = false;
+		_routeChangeObservable.subscribe(this._onRouteChange, this._initialize);
 	}
 
 	hostDisconnected() {
@@ -129,12 +123,8 @@ export class ContextReactor {
 	}
 
 	_onRouteChange(context) {
-		if (this._initializing) {
-			this._initialize?.(context);
-		} else {
-			this._callback?.(context);
-			this.host.requestUpdate();
-		}
+		this._callback?.(context);
+		this.host.requestUpdate();
 	}
 }
 

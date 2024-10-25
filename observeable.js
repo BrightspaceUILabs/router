@@ -15,10 +15,10 @@ export default class Observable {
 		this._previousData = data;
 	}
 
-	subscribe(observer) {
+	subscribe(observer, initialize) {
 		this._observers.set(observer, observer);
 		if (this._hasTriggered) {
-			observer(this._previousData);
+			initialize?.(this._previousData);
 		}
 	}
 
