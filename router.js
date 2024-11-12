@@ -1,4 +1,4 @@
-import Observable from './observeable.js';
+import PubSub from './pub-sub.js';
 import page from 'page';
 
 let activePage = page;
@@ -15,7 +15,7 @@ export const _createReducedContext = pageContext => ({
 	options: {},
 });
 
-const _routeChangeObservable = new Observable();
+const _routeChangePubSub = new PubSub();
 
 const _handleRouteView = (context, r) => {
 	if (r.view) {
@@ -24,7 +24,7 @@ const _handleRouteView = (context, r) => {
 			reducedContext.options = options || {};
 			return r.view.call(host, reducedContext);
 		};
-		_routeChangeObservable.notify(context);
+		_routeChangePubSub.publish(context);
 	}
 };
 
@@ -106,25 +106,35 @@ export const redirect = path => {
 export class ContextReactor {
 	constructor(host, callback, initialize) {
 		this.host = host;
-		this.host.addController(this);
+		this.host?.addController(this);
 
 		this._callback = callback;
 		this._initialize = initialize;
 
 		this._onRouteChange = this._onRouteChange.bind(this);
+
+		if (!this.host) this.connect(); // Support for non-LitElement use cases
+	}
+
+	connect() {
+		_routeChangePubSub.subscribe(this._onRouteChange, this._initialize);
+	}
+
+	disconnect() {
+		_routeChangePubSub.unsubscribe(this._onRouteChange);
 	}
 
 	hostConnected() {
-		_routeChangeObservable.subscribe(this._onRouteChange, this._initialize);
+		this.connect();
 	}
 
 	hostDisconnected() {
-		_routeChangeObservable.unsubscribe(this._onRouteChange);
+		this.disconnect();
 	}
 
 	_onRouteChange(context) {
 		this._callback?.(context);
-		this.host.requestUpdate();
+		this.host?.requestUpdate();
 	}
 }
 
@@ -133,7 +143,7 @@ export const RouterTesting = {
 		activePage.stop();
 		activePage = page.create();
 		hasRegistered = false;
-		_routeChangeObservable.clear();
+		_routeChangePubSub.clear();
 	},
 
 	restart: () => {
