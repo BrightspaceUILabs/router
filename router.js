@@ -24,7 +24,7 @@ const _handleRouteView = (context, r) => {
 			reducedContext.options = options || {};
 			return r.view.call(host, reducedContext);
 		};
-		_routeChangePubSub.publish(context);
+		context.handled = true;
 	}
 };
 
@@ -81,7 +81,11 @@ export const registerRoutes = (routes, options) => {
 		searchParams.forEach((value, key) => {
 			context.searchParams[key] = value;
 		});
+
 		next();
+
+		// Publish the new context after the route change is complete.
+		_routeChangePubSub.publish(context);
 	});
 
 	// Simulate the route order inversion issue by reversing the routes if the enableRouteOrderFix option is not enabled.
@@ -134,7 +138,8 @@ export class ContextReactor {
 
 	_onRouteChange(context) {
 		this._callback?.(context);
-		this.host?.requestUpdate();
+
+		if (context.handled) this.host?.requestUpdate();
 	}
 }
 
