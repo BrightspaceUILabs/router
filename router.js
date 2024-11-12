@@ -1,5 +1,5 @@
-import PubSub from './pub-sub.js';
 import page from 'page';
+import PubSub from './pub-sub.js';
 
 let activePage = page;
 let _lastOptions = {};
