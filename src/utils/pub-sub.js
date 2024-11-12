@@ -7,6 +7,12 @@ export default class PubSub {
 
 	clear() {
 		this._listeners.clear();
+		this._hasTriggered = false;
+		this._previousData = null;
+	}
+
+	getListenersCount() {
+		return this._listeners.size;
 	}
 
 	publish(data) {

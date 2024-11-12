@@ -121,11 +121,14 @@ export class ContextReactor {
 	}
 
 	connect() {
+		const initPage = _routeChangePubSub.getListenersCount() === 0;
 		_routeChangePubSub.subscribe(this._onRouteChange, this._initialize);
+		if (!hasRegistered && initPage) activePage();
 	}
 
 	disconnect() {
 		_routeChangePubSub.unsubscribe(this._onRouteChange);
+		if (!hasRegistered && _routeChangePubSub.getListenersCount() === 0) activePage.stop();
 	}
 
 	hostConnected() {
