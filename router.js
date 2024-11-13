@@ -32,6 +32,9 @@ const _handleRouteLoader = r => (context) => {
 	if (r.loader) {
 		r.loader().then(() => {
 			_handleRouteView(context, r);
+
+			// Publish the new context after the loading is complete.
+			_routeChangePubSub.publish(context);
 		});
 	} else if (r.pattern && r.to) {
 		activePage.redirect(r.to);
