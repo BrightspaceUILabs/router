@@ -11,7 +11,7 @@
     "test": "npm run lint && npm run test:unit",
     "test:unit": "d2l-test-runner"
   },
-  "version": "3.2.0",
+  "version": "3.2.1",
   "dependencies": {
     "lit": "^3",
     "page": "^1"
