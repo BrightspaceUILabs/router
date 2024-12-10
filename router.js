@@ -1,8 +1,8 @@
 import page from 'page';
+import PubSub from './src/utils/pub-sub.js';
 
 let activePage = page;
 let _lastOptions = {};
-let _lastContext = {};
 
 export const _createReducedContext = pageContext => ({
 	params: pageContext.params,
@@ -15,14 +15,9 @@ export const _createReducedContext = pageContext => ({
 	options: {},
 });
 
-const _storeCtx = () => {
-	activePage('*', (context, next) => {
-		_lastContext = context;
-		next();
-	});
-};
+const _routeChangePubSub = new PubSub();
 
-const _handleRouteView = (context, next, r) => {
+const _handleRouteView = (context, r) => {
 	if (r.view) {
 		const reducedContext = _createReducedContext(context);
 		context.view = (host, options) => {
@@ -30,35 +25,21 @@ const _handleRouteView = (context, next, r) => {
 			return r.view.call(host, reducedContext);
 		};
 		context.handled = true;
-
-		next();
-	} else {
-		next();
 	}
 };
 
-const _handleRouteLoader = r => (context, next) => {
-	const enableRouteOrderFix = _lastOptions?.enableRouteOrderFix ?? false;
-
-	// Skip further pattern matches if the route has already been handled
-	if (enableRouteOrderFix && context.handled) {
-		next();
-		return;
-	}
-
+const _handleRouteLoader = r => (context) => {
 	if (r.loader) {
 		r.loader().then(() => {
-			_handleRouteView(context, next, r);
+			_handleRouteView(context, r);
+
+			// Publish the new context after the loading is complete.
+			_routeChangePubSub.publish(context);
 		});
 	} else if (r.pattern && r.to) {
-		if (enableRouteOrderFix) {
-			activePage.redirect(r.to);
-		} else {
-			activePage.redirect(r.pattern, r.to);
-			next();
-		}
+		activePage.redirect(r.to);
 	} else {
-		_handleRouteView(context, next, r);
+		_handleRouteView(context, r);
 	}
 };
 
@@ -103,17 +84,18 @@ export const registerRoutes = (routes, options) => {
 		searchParams.forEach((value, key) => {
 			context.searchParams[key] = value;
 		});
-		next();
-	});
-	_registerRoutes(routes);
-	_storeCtx();
-};
 
-const addMiddleware = callback => {
-	activePage('*', (ctx, next) => {
-		callback(ctx);
 		next();
+
+		// Publish the new context after the route change is complete.
+		_routeChangePubSub.publish(context);
 	});
+
+	// Simulate the route order inversion issue by reversing the routes if the enableRouteOrderFix option is not enabled.
+	// TODO: Remove the reverse() call and the enableRouteOrderFix option once all consumers with a workaround have updated their implementation with the fix.
+	_registerRoutes(options.enableRouteOrderFix ? routes : routes.reverse());
+
+	activePage();
 };
 
 // Triggers navigation to the specified route path.
@@ -129,45 +111,50 @@ export const redirect = path => {
 };
 
 export class ContextReactor {
-
-	static reset() {
-		this.listeners = [];
-	}
-
 	constructor(host, callback, initialize) {
-		ContextReactor.listeners.push({ host, callback });
+		this.host = host;
+		this.host?.addController(this);
 
-		if (ContextReactor.listeners.length === 1) {
-			addMiddleware(ctx => {
-				ContextReactor.listeners.forEach(listener => {
-					listener.callback(ctx);
-					// call requestUpdate only for known routes when ctx.handled is truthy
-					if (listener.host && ctx.handled) {
-						listener.host.requestUpdate();
-					}
-				});
-			});
-		}
-		// initialize the listener with the context from the last run
-		if (initialize) {
-			initialize(_lastContext);
-		}
+		this._callback = callback;
+		this._initialize = initialize;
+
+		this._onRouteChange = this._onRouteChange.bind(this);
+
+		if (!this.host) this.connect(); // Support for non-LitElement use cases
 	}
 
-	init() {
-		activePage();
+	connect() {
+		const initPage = _routeChangePubSub.getListenersCount() === 0;
+		_routeChangePubSub.subscribe(this._onRouteChange, this._initialize);
+		if (!hasRegistered && initPage) activePage();
 	}
 
+	disconnect() {
+		_routeChangePubSub.unsubscribe(this._onRouteChange);
+		if (!hasRegistered && _routeChangePubSub.getListenersCount() === 0) activePage.stop();
+	}
+
+	hostConnected() {
+		this.connect();
+	}
+
+	hostDisconnected() {
+		this.disconnect();
+	}
+
+	_onRouteChange(context) {
+		this._callback?.(context);
+
+		if (context.handled) this.host?.requestUpdate();
+	}
 }
-
-ContextReactor.listeners = [];
 
 export const RouterTesting = {
 	reset: () => {
 		activePage.stop();
 		activePage = page.create();
 		hasRegistered = false;
-		ContextReactor.reset();
+		_routeChangePubSub.clear();
 	},
 
 	restart: () => {
