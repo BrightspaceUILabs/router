@@ -33,6 +33,7 @@
   "files": [
     "index.js",
     "router.js",
-    "RouteReactor.js"
+    "RouteReactor.js",
+    "src/"
   ]
 }
